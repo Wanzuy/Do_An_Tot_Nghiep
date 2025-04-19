@@ -1,0 +1,15 @@
+{
+    "login": {
+        "title": "FIRE ALARM MANAGEMENT SYSTEM",
+        "username": "Username",
+        "password": "Password",
+        "loginButton": "Login",
+        "usernameRequired": "Please enter your username!",
+        "passwordRequired": "Please enter your password!",
+        "placeholder": {
+            "username": "Enter username...",
+            "password": "Enter password..."
+        },
+        "copyright": "© 2025 - Copyright by Tinventor Electronics"
+    }
+}

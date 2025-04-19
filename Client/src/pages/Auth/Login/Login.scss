@@ -1,0 +1,126 @@
+/* Login.scss */
+html,
+body {
+    overflow: hidden;
+    height: 100%;
+}
+
+body,
+#root {
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    position: relative;
+}
+
+.h-screen {
+    min-height: 100vh;
+}
+
+/* Đảm bảo các phần tử background nằm đúng vị trí */
+
+/* Fire alarm themed background */
+.background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+        45deg,
+        #340000,
+        #340000 10px,
+        #4a0000 10px,
+        #4a0000 20px
+    );
+    z-index: -2;
+}
+
+/* Alarm grid overlay */
+.grid-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: linear-gradient(rgba(255, 0, 0, 0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 0, 0, 0.1) 1px, transparent 1px);
+    background-size: 20px 20px;
+    z-index: -1;
+}
+
+/* Pulsing alert effect */
+.alert-effect {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(
+        circle at center,
+        transparent 0%,
+        rgba(255, 0, 0, 0.1) 80%,
+        rgba(255, 0, 0, 0.3) 100%
+    );
+    z-index: -1;
+    animation: pulse 4s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        opacity: 0.3;
+    }
+    50% {
+        opacity: 0.8;
+    }
+    100% {
+        opacity: 0.3;
+    }
+}
+
+/* Fire icons floating in background */
+.fire-icon {
+    position: absolute;
+    opacity: 0.1;
+    color: #ff0000;
+    z-index: -1;
+    animation: float 20s infinite linear;
+}
+
+@keyframes float {
+    0% {
+        transform: translateY(0) rotate(0deg);
+    }
+    100% {
+        transform: translateY(-1000px) rotate(360deg);
+    }
+}
+
+/* Custom styles for Ant Design components */
+.login-btn {
+    background: linear-gradient(135deg, #c00000, #ff2200) !important;
+    border: none !important;
+
+    &:hover {
+        background: linear-gradient(135deg, #a30000, #e31f00) !important;
+        box-shadow: 0 4px 8px rgba(209, 0, 0, 0.3) !important;
+    }
+}
+
+// Override Ant Design form styles
+.ant-form-item-label > label {
+    font-weight: 500 !important;
+}
+
+.ant-input:focus,
+.ant-input-affix-wrapper:focus,
+.ant-input-focused,
+.ant-input-affix-wrapper-focused {
+    border-color: #d10000 !important;
+    box-shadow: 0 0 0 2px rgba(209, 0, 0, 0.2) !important;
+}
+
+.header-icon svg {
+    filter: drop-shadow(0px 2px 2px rgba(0, 0, 0, 0.3));
+}
