@@ -15,8 +15,8 @@ const UserSchema = new Schema({
     },
     role: {
         type: Number,
-        // 0: chủ hệ thống (supper admin)  1: quản trị viên, 2: vận hành hệ thống, 3: kỹ thuật viên bảo trì, 4: chưa phân quyền
-        enum: [0, 1, 2, 3, 4],
+        // 1: quản trị viên, 2: vận hành hệ thống, 3: kỹ thuật viên bảo trì, 4: chưa phân quyền
+        enum: [1, 2, 3, 4],
         default: 4,
     },
     showname: {
