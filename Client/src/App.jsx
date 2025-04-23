@@ -1,6 +1,7 @@
 import { ConfigProvider } from "antd";
 import "@ant-design/v5-patch-for-react-19";
 import Routers from "./routers/Routers";
+import StoreProvider from "./store/StoreProvider";
 
 function App() {
     return (
@@ -13,7 +14,9 @@ function App() {
                 },
             }}
         >
-            <Routers />
+            <StoreProvider>
+                <Routers />
+            </StoreProvider>
         </ConfigProvider>
     );
 }
