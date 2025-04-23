@@ -169,7 +169,7 @@ const login = async (req: any, res: any) => {
         if (!isPasswordValid) {
             return res
                 .status(401)
-                .json({ message: "Tài khoản hoặc mật khẩu không chính xác" });
+                .json({ message: "Tài khoản hoặc mật khẩu không chính xác!" });
         }
 
         delete user._doc.password;
