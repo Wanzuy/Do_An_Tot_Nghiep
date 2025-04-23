@@ -2,6 +2,7 @@ import { ConfigProvider } from "antd";
 import "@ant-design/v5-patch-for-react-19";
 import Routers from "./routers/Routers";
 import StoreProvider from "./store/StoreProvider";
+import { ToastContainer } from 'react-toastify';
 
 function App() {
     return (
@@ -16,6 +17,7 @@ function App() {
         >
             <StoreProvider>
                 <Routers />
+                <ToastContainer />
             </StoreProvider>
         </ConfigProvider>
     );

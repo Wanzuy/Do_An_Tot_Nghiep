@@ -1,11 +1,20 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Input, Form } from "antd";
 import { EyeInvisibleOutlined, EyeTwoTone } from "@ant-design/icons";
-import "./Login.scss";
 import logoVN from "../../../assets/imgs/vietnam.png";
+import { accountnameRule, passwordRule } from "../../../utils/ rules";
+import { useDispatch } from 'react-redux';
+import { addAuth } from '../../../store/reducers/authReducer';
+import handleAPI from '../../../api/handleAPI'
+import { apiEndpoint } from '../../../constants/apiEndpoint';
+import { toast } from 'react-toastify';
+import "./Login.scss";
+import { localDataNames } from "../../../constants/appInfo";
 
 const Login = () => {
+    const [isloading, setIsloading] = useState(false);
     const [form] = Form.useForm();
+    const dispatch = useDispatch();
 
     useEffect(() => {
         createFloatingIcons();
@@ -26,8 +35,22 @@ const Login = () => {
     };
 
     const onFinish = (values) => {
-        console.log("Success:", values);
+        setIsloading(true);
+        try {
+            const res = handleAPI(apiEndpoint.auth.login, values, 'post')
+            if(res.data){
+                toast.success(res.message);
+                dispatch(addAuth(res.data))
+                localStorage.setItem(localDataNames.authData, JSON.stringify(res.data))
+            }
+        } catch (error) {
+            toast(error.message)
+        }finally{
+            setIsloading(false);
+        }
     };
+
+   
 
     return (
         <div className="h-screen flex justify-center items-center relative overflow-hidden px-10">
@@ -119,14 +142,8 @@ const Login = () => {
                                             Tên đăng nhập:
                                         </span>
                                     }
-                                    name="username"
-                                    rules={[
-                                        {
-                                            required: true,
-                                            message:
-                                                "Vui lòng nhập tên đăng nhập!",
-                                        },
-                                    ]}
+                                    name="accountname"
+                                    rules={accountnameRule}
                                     className="mb-5"
                                 >
                                     <Input
@@ -143,12 +160,7 @@ const Login = () => {
                                         </span>
                                     }
                                     name="password"
-                                    rules={[
-                                        {
-                                            required: true,
-                                            message: "Vui lòng nhập mật khẩu!",
-                                        },
-                                    ]}
+                                    rules={passwordRule}
                                     className="mb-6"
                                 >
                                     <Input.Password
@@ -170,6 +182,7 @@ const Login = () => {
                                         type="primary"
                                         htmlType="submit"
                                         className="login-btn px-6 py-[1rem] h-auto w-full font-medium text-[1.6rem] rounded-2xl flex items-center justify-center"
+                                        loading={isloading}
                                     >
                                         Đăng nhập
                                     </Button>
