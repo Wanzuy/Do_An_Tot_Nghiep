@@ -22,7 +22,7 @@ i18n.use(Backend)
     .init({
         resources,
         fallbackLng: "vi",
-        debug: true,
+        debug: false,
 
         interpolation: {
             escapeValue: false,

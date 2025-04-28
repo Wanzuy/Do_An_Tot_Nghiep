@@ -1,15 +1,12 @@
 {
-    "login": {
-        "title": "FIRE ALARM MANAGEMENT SYSTEM",
-        "username": "Username",
-        "password": "Password",
-        "loginButton": "Login",
-        "usernameRequired": "Please enter your username!",
-        "passwordRequired": "Please enter your password!",
-        "placeholder": {
-            "username": "Enter username...",
-            "password": "Enter password..."
-        },
-        "copyright": "© 2025 - Copyright by Tinventor Electronics"
+    "dashboard": "Dashboard",
+    "settings": "Settings",
+    "information": "Information",
+    "logout": "Logout",
+    "info": {
+        "title": "System Information",
+        "copyright": "2025 - Copyright Tinventor Electronics Co., Ltd.",
+        "version": "Version:",
+        "reserve": "© 2025 Tinventor Electronics - All rights reserved."
     }
 }

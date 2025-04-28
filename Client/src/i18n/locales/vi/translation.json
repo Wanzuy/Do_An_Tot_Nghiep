@@ -1,15 +1,12 @@
 {
-    "login": {
-        "title": "HỆ THỐNG QUẢN LÝ BÁO CHÁY",
-        "username": "Tên đăng nhập",
-        "password": "Mật khẩu",
-        "loginButton": "Đăng nhập",
-        "usernameRequired": "Vui lòng nhập tên đăng nhập!",
-        "passwordRequired": "Vui lòng nhập mật khẩu!",
-        "placeholder": {
-            "username": "Nhập tên đăng nhập...",
-            "password": "Nhập mật khẩu..."
-        },
-        "copyright": "© 2025 - bản quyền thuộc về Tinventor Electronics"
+    "dashboard": "Bảng điều khiển",
+    "settings": "Cài đặt",
+    "information": "Thông tin",
+    "logout": "Đăng xuất",
+    "info": {
+        "title": "Thông tin hệ thống",
+        "copyright": "2025 - Bản quyền thuộc về công ty TNHH Tinventor Electronics",
+        "version": "Phiên bản:",
+        "reserve": "© 2025 Tinventor Electronics - Tất cả các quyền được bảo lưu."
     }
 }
