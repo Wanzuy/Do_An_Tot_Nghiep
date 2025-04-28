@@ -6,7 +6,7 @@ import AuthRouter from "./AuthRouter";
 const Routers = () => {
     return (
         <BrowserRouter>
-            {1 >= 2 ? <MainRouter /> : <AuthRouter />}
+            {1 <= 2 ? <MainRouter /> : <AuthRouter />}
         </BrowserRouter>
     );
 };

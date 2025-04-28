@@ -3,11 +3,11 @@ import { Button, Input, Form } from "antd";
 import { EyeInvisibleOutlined, EyeTwoTone } from "@ant-design/icons";
 import logoVN from "../../../assets/imgs/vietnam.png";
 import { accountnameRule, passwordRule } from "../../../utils/ rules";
-import { useDispatch } from 'react-redux';
-import { addAuth } from '../../../store/reducers/authReducer';
-import handleAPI from '../../../api/handleAPI'
-import { apiEndpoint } from '../../../constants/apiEndpoint';
-import { toast } from 'react-toastify';
+import { useDispatch } from "react-redux";
+import { addAuth } from "../../../store/reducers/authReducer";
+import handleAPI from "../../../api/handleAPI";
+import { apiEndpoint } from "../../../constants/apiEndpoint";
+import { toast } from "react-toastify";
 import "./Login.scss";
 import { localDataNames } from "../../../constants/appInfo";
 
@@ -34,23 +34,26 @@ const Login = () => {
         }
     };
 
-    const onFinish = (values) => {
+    const onFinish = async (values) => {
         setIsloading(true);
         try {
-            const res = handleAPI(apiEndpoint.auth.login, values, 'post')
-            if(res.data){
+            const res = await handleAPI(apiEndpoint.auth.login, values, "post");
+            console.log(res);
+
+            if (res.data) {
                 toast.success(res.message);
-                dispatch(addAuth(res.data))
-                localStorage.setItem(localDataNames.authData, JSON.stringify(res.data))
+                dispatch(addAuth(res.data));
+                localStorage.setItem(
+                    localDataNames.authData,
+                    JSON.stringify(res.data)
+                );
             }
         } catch (error) {
-            toast(error.message)
-        }finally{
+            toast.error(error.message);
+        } finally {
             setIsloading(false);
         }
     };
-
-   
 
     return (
         <div className="h-screen flex justify-center items-center relative overflow-hidden px-10">
