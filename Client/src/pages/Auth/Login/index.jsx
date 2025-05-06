@@ -7,9 +7,9 @@ import { useDispatch } from "react-redux";
 import { addAuth } from "../../../store/reducers/authReducer";
 import handleAPI from "../../../api/handleAPI";
 import { apiEndpoint } from "../../../constants/apiEndpoint";
-import { toast } from "react-toastify";
 import "./Login.scss";
 import { localDataNames } from "../../../constants/appInfo";
+import { errorToast, successToast } from "../../../utils/toastConfig";
 
 const Login = () => {
     const [isloading, setIsloading] = useState(false);
@@ -38,10 +38,9 @@ const Login = () => {
         setIsloading(true);
         try {
             const res = await handleAPI(apiEndpoint.auth.login, values, "post");
-            console.log(res);
 
             if (res.data) {
-                toast.success(res.message);
+                successToast(res.message);
                 dispatch(addAuth(res.data));
                 localStorage.setItem(
                     localDataNames.authData,
@@ -49,7 +48,7 @@ const Login = () => {
                 );
             }
         } catch (error) {
-            toast.error(error.message);
+            errorToast(error.message);
         } finally {
             setIsloading(false);
         }
@@ -72,7 +71,7 @@ const Login = () => {
             <div className="fire-icon text-2xl left-[40%] top-[65%]">🆘</div>
             <div className="fire-icon text-3xl left-[75%] top-[40%]">🔴</div>
 
-            <div className="bg-white  rounded-[1.8rem] overflow-hidden">
+            <div className="bg-white rounded-[1.8rem] overflow-hidden max-w-[714px]">
                 {/* Header chồng lên trên */}
                 <div className="w-full max-w-[900px] ">
                     <div className="bg-gradient-to-r from-red-800 to-red-600 text-white py-4 px-6 text-center text-xl font-bold  shadow-lg">

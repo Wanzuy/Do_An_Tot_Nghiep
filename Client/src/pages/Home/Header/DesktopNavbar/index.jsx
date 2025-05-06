@@ -27,7 +27,7 @@ function DesktopNavbar({ t }) {
     const handleMenuClick = (key) => {
         switch (key) {
             case "1":
-                navigate("/");
+                navigate("/bang-dieu-khien");
                 break;
             case "2":
                 navigate("/cai-dat");
@@ -36,7 +36,7 @@ function DesktopNavbar({ t }) {
                 navigate("/thong-tin-he-thong");
                 break;
             default:
-                navigate("/");
+                navigate("/bang-dieu-khien");
         }
     };
     return (

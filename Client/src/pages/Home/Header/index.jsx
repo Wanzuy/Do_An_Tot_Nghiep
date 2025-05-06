@@ -5,21 +5,32 @@ import {
     MenuFoldOutlined,
     UserOutlined,
 } from "@ant-design/icons";
-import { Button, Card, Dropdown, Space } from "antd";
+import { Button, Card, Dropdown, Space, Drawer } from "antd";
 import { Header as AntHeader } from "antd/es/layout/layout";
 import { GB, VN } from "country-flag-icons/react/3x2";
-import DesktopNavbar from "../DesktopNavbar";
+import DesktopNavbar from "./DesktopNavbar";
+import "./Header.scss";
+import MobileNavbar from "./MobileNavbar";
+import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { removeAuth } from "../../../store/reducers/authReducer";
 
 function Header({ t, i18n }) {
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
     const [currentDate, setCurrentDate] = useState("");
     const [currentTime, setCurrentTime] = useState("");
+
+    const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
 
     const changeLanguage = (lng) => {
         i18n.changeLanguage(lng);
     };
 
+    // useEffect này là để cập nhật thời gian và ngày tháng hiện tại
     useEffect(() => {
-        // Format date as DD-MM-YYYY
         const today = new Date();
         const formattedDate = `${String(today.getDate()).padStart(
             2,
@@ -30,7 +41,6 @@ function Header({ t, i18n }) {
         )}-${today.getFullYear()}`;
         setCurrentDate(formattedDate);
 
-        // Update time every second
         const timeInterval = setInterval(() => {
             const now = new Date();
             const hours = String(now.getHours()).padStart(2, "0");
@@ -42,6 +52,25 @@ function Header({ t, i18n }) {
 
         return () => clearInterval(timeInterval);
     }, []);
+
+    // useEffect này là để kiểm tra kích thước
+    useEffect(() => {
+        const checkIsMobile = () => {
+            setIsMobile(window.innerWidth < 1024);
+        };
+
+        checkIsMobile();
+
+        window.addEventListener("resize", checkIsMobile);
+
+        return () => window.removeEventListener("resize", checkIsMobile);
+    }, []);
+
+    const logout = () => {
+        dispatch(removeAuth());
+        localStorage.removeItem("authData");
+        navigate("/");
+    };
 
     const dropDownItems = [
         {
@@ -72,14 +101,13 @@ function Header({ t, i18n }) {
                     {t("logout")}
                 </Space>
             ),
-            onClick: () => {
-                console.log("Logout clicked");
-            },
+            onClick: logout,
         },
     ];
 
     return (
-        <AntHeader className="bg-gradient-to-r from-[#c62828] to-[#b71c1c] h-auto flex justify-between items-center shadow-md sticky top-0 z-50">
+        <AntHeader className="Header bg-gradient-to-r from-[#c62828] to-[#b71c1c] h-auto flex justify-between items-center shadow-md sticky top-0 z-50">
+            {/* Logo và tên ứng dụng */}
             <div className="flex items-center ">
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -116,24 +144,33 @@ function Header({ t, i18n }) {
                         fill="white"
                     />
                 </svg>
+                {isMobile && (
+                    <span className="text-[2rem] font-bold text-white ml-2">
+                        FireGo
+                    </span>
+                )}
             </div>
+            {/* từ kích thước màn hình 1024 trở lên */}
             <DesktopNavbar t={t} />
+
             <div className="flex items-center">
                 <Space size="small">
-                    <Card
-                        size="small"
-                        className="bg-transparent border-none text-white"
-                    >
-                        <div className="flex flex-col items-center">
-                            <div className="flex items-center gap-1 text-[1.2rem] opacity-80">
-                                <UserOutlined />
-                                <span>Admin</span>
+                    {!isMobile && (
+                        <Card
+                            size="small"
+                            className="bg-transparent border-none text-white"
+                        >
+                            <div className="flex flex-col items-center">
+                                <div className="flex items-center gap-1 text-[1.2rem] opacity-80">
+                                    <UserOutlined />
+                                    <span>Admin</span>
+                                </div>
+                                <span className="block font-semibold text-center text-[1.4rem]">
+                                    Admin
+                                </span>
                             </div>
-                            <span className="block font-semibold text-center text-[1.4rem]">
-                                Admin
-                            </span>
-                        </div>
-                    </Card>
+                        </Card>
+                    )}
 
                     <Card
                         size="small"
@@ -160,20 +197,41 @@ function Header({ t, i18n }) {
                     </Card>
                 </Space>
 
-                <Dropdown
-                    menu={{ items: dropDownItems }}
-                    placement="bottomRight"
-                    arrow
-                    trigger={["click"]}
-                >
+                {/* Hiển thị Dropdown hoặc nút mở Drawer tùy thuộc kích thước màn hình */}
+                {!isMobile ? (
+                    <Dropdown
+                        menu={{ items: dropDownItems }}
+                        placement="bottomRight"
+                        arrow
+                        trigger={["click"]}
+                    >
+                        <Button
+                            type="ghost"
+                            shape="circle"
+                            icon={<MenuFoldOutlined />}
+                            className="text-white ml-4 mr-4 bg-black bg-opacity-20 border-0"
+                        />
+                    </Dropdown>
+                ) : (
                     <Button
                         type="ghost"
                         shape="circle"
                         icon={<MenuFoldOutlined />}
-                        className="text-white ml-4 mr-4 bg-black bg-opacity-20 border-0  "
+                        onClick={() => setIsDrawerOpen(true)}
+                        className="text-white ml-4 mr-4 bg-black bg-opacity-20 border-0"
                     />
-                </Dropdown>
+                )}
             </div>
+
+            {/* Drawer cho màn hình mobile */}
+            <MobileNavbar
+                setIsDrawerOpen={setIsDrawerOpen}
+                isMobile={isMobile}
+                isDrawerOpen={isDrawerOpen}
+                t={t}
+                changeLanguage={changeLanguage}
+                logout={logout}
+            />
         </AntHeader>
     );
 }

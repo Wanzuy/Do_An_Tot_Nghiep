@@ -8,5 +8,9 @@
         "copyright": "2025 - Bản quyền thuộc về công ty TNHH Tinventor Electronics",
         "version": "Phiên bản:",
         "reserve": "© 2025 Tinventor Electronics - Tất cả các quyền được bảo lưu."
+    },
+    "404": {
+        "message": "Xin lỗi, trang bạn đã truy cập không tồn tại.",
+        "back": "Quay lại trang chủ"
     }
 }

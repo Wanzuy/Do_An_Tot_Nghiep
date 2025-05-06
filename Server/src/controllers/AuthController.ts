@@ -33,8 +33,11 @@ const createAccount = async (req: any, res: any) => {
         }
 
         body.password = await hashPassword(password);
-        const newUser = new UserModel(body);
+        const newUser: any = new UserModel(body);
         await newUser.save();
+
+        delete newUser._doc.password;
+
         return res
             .status(201)
             .json({ message: "Tạo tài khoản thành công", data: newUser });

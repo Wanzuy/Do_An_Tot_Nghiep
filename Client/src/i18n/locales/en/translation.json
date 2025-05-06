@@ -8,5 +8,9 @@
         "copyright": "2025 - Copyright Tinventor Electronics Co., Ltd.",
         "version": "Version:",
         "reserve": "© 2025 Tinventor Electronics - All rights reserved."
+    },
+    "404": {
+        "message": "Sorry, the page you visited does not exist.",
+        "back": "Back to Home"
     }
 }

@@ -19,7 +19,7 @@ function Information({ t }) {
                 <title>Tinventor - Thông tin hệ thống</title>
             </Helmet>
             <div className="flex flex-col items-center justify-center min-h-[100%]">
-                <div className="max-w-[650px] w-full rounded-md bg-[#1e1e1e] shadow-lg border border-[#c53838] p-6 relative">
+                <div className="max-w-[650px] w-full rounded-md bg-[#1e1e1e] shadow-lg border-4 border-[#c53838] p-6 relative">
                     {/* Background gradient accent */}
                     <div className="absolute -top-24 -right-24 w-48 h-48 bg-red-600/10 rounded-full blur-3xl"></div>
                     <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-red-600/5 rounded-full blur-3xl"></div>
@@ -40,7 +40,7 @@ function Information({ t }) {
                             <img
                                 src={logoTinventor}
                                 alt="logo-tinventor"
-                                className="w-full  h-auto max-h-36  mx-auto"
+                                className="w-full object-contain h-auto max-h-36  mx-auto"
                             />
                         </div>
                     </div>
@@ -74,7 +74,7 @@ function Information({ t }) {
                     </div>
                 </div>
 
-                <p className="mt-8 text-gray-500 text-[1.2rem]">
+                <p className="mt-8 text-gray-500 text-[1.2rem] text-center sm:text-left">
                     {t("info.reserve")}
                 </p>
             </div>
