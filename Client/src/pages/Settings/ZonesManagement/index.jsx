@@ -107,8 +107,8 @@ function ZonesManagement({ t }) {
 
     return (
         <div className="p-4 lg:p-[5rem]">
-            <div className="w-full">
-                <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-8">
+            <div>
+                <div className="md:bg-[#434343] md:p-4 md:rounded-xl md:shadow-lg flex flex-col md:flex-row md:justify-between md:items-center mb-8">
                     <div className="flex items-center gap-4 md:mb-0 mb-4">
                         <Link to="/cai-dat">
                             <LeftCircleFilled className="text-[2.5rem] text-white" />
@@ -133,7 +133,7 @@ function ZonesManagement({ t }) {
                         dữ liệu...
                     </div>
                 ) : (
-                    <div className="bg-[#1e1e1e] p-6 rounded-xl text-white shadow-lg border border-white/10">
+                    <div className="bg-[#434343] p-6 rounded-xl text-white shadow-lg border border-white/10">
                         {zoneTree.length > 0 ? (
                             <ZoneTree
                                 t={t}

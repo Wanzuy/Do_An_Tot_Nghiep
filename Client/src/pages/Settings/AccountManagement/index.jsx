@@ -144,8 +144,8 @@ function AccountManagement({ t }) {
 
     return (
         <div className="p-4 lg:p-[5rem]">
-            <div className="w-full">
-                <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-8">
+            <div>
+                <div className="md:bg-[#434343] md:p-4 md:rounded-xl md:shadow-lg flex flex-col md:flex-row md:justify-between md:items-center mb-8">
                     <div className="flex items-center gap-4 md:mb-0 mb-4">
                         <Link to="/cai-dat">
                             <LeftCircleFilled className="text-[2.5rem] text-white" />
@@ -179,10 +179,10 @@ function AccountManagement({ t }) {
                             return (
                                 <div
                                     key={user._id || index}
-                                    className="bg-[#1e1e1e] p-6 md:px-10 rounded-xl text-white shadow-lg transition hover:shadow-xl border border-white/10"
+                                    className="bg-[#434343] p-6 md:px-10 rounded-xl text-white shadow-lg transition hover:shadow-xl border border-white/10"
                                 >
                                     {/* Header của thẻ người dùng */}
-                                    <div className="flex items-center justify-between mb-3">
+                                    <div className=" flex items-center justify-between mb-3">
                                         <div className="flex items-center gap-2">
                                             <UserOutlined />
                                             <span className="font-medium">

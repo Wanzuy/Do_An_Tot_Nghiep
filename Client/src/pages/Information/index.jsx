@@ -19,7 +19,7 @@ function Information({ t }) {
                 <title>Tinventor - Thông tin hệ thống</title>
             </Helmet>
             <div className="flex flex-col items-center justify-center min-h-[100%] px-4 md:px-0">
-                <div className="max-w-[650px] w-full rounded-md bg-[#1e1e1e] shadow-lg border-4 border-[#c53838] p-6 relative">
+                <div className="max-w-[650px] w-full rounded-md bg-[#434343] shadow-lg border-4 border-[#c53838] p-6 relative">
                     {/* Background gradient accent */}
                     <div className="absolute -top-24 -right-24 w-48 h-48 bg-red-600/10 rounded-full blur-3xl"></div>
                     <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-red-600/5 rounded-full blur-3xl"></div>

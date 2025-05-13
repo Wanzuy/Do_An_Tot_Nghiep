@@ -1,12 +1,11 @@
 import React, { useState } from "react";
-import { Modal, Form, Input, Select, Button } from "antd";
+import { Modal, Form, Input, Button, TreeSelect } from "antd";
 import { PlusCircleOutlined } from "@ant-design/icons";
 import handleAPI from "../../../../api/handleAPI";
 import { errorToast, successToast } from "../../../../utils/toastConfig";
 import { apiEndpoint } from "../../../../constants/apiEndpoint";
 import { getRules } from "../../../../utils/rules";
 
-const { Option } = Select;
 const { TextArea } = Input;
 
 const AddZoneModal = ({ t, isOpen, onClose, onSuccess, zones }) => {
@@ -41,6 +40,25 @@ const AddZoneModal = ({ t, isOpen, onClose, onSuccess, zones }) => {
             setIsSubmitting(false);
         }
     };
+
+    // Chuyển đổi dữ liệu zones thành dạng cây cho TreeSelect
+    const convertZonesToTreeData = (items, parentId = null) => {
+        return items
+            .filter(
+                (item) =>
+                    (parentId === null && !item.parentId) ||
+                    item.parentId === parentId
+            )
+            .map((item) => ({
+                title: item.name,
+                value: item._id,
+                key: item._id,
+                children: convertZonesToTreeData(items, item._id),
+            }));
+    };
+
+    // Tạo dữ liệu dạng cây cho TreeSelect
+    const treeData = convertZonesToTreeData(zones);
 
     return (
         <Modal
@@ -84,16 +102,21 @@ const AddZoneModal = ({ t, isOpen, onClose, onSuccess, zones }) => {
                         </span>
                     }
                 >
-                    <Select
+                    <TreeSelect
+                        treeData={treeData}
                         placeholder={t("ZonesManagement.parentZonePlaceholder")}
                         allowClear
-                    >
-                        {zones.map((zone) => (
-                            <Option key={zone._id} value={zone._id}>
-                                {zone.name}
-                            </Option>
-                        ))}
-                    </Select>
+                        treeDefaultExpandAll
+                        showSearch
+                        filterTreeNode={(inputValue, treeNode) =>
+                            treeNode.title
+                                .toLowerCase()
+                                .includes(inputValue.toLowerCase())
+                        }
+                        treeNodeLabelProp="title"
+                        treeLine={{ showLeafIcon: false }}
+                        treeNodeFilterProp="title"
+                    />
                 </Form.Item>
 
                 <Form.Item

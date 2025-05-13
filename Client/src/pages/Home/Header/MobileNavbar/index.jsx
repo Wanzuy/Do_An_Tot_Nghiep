@@ -110,7 +110,7 @@ function MobileNavbar({
                 <div className="p-4">
                     <Link
                         to="/bang-dieu-khien"
-                        className={`flex items-center cursor-pointer p-4 hover:text-white ${
+                        className={`flex items-center cursor-pointer p-4 hover:text-[#b22222] ${
                             isActive("/bang-dieu-khien")
                                 ? "text-[#b22222] font-semibold"
                                 : "text-white"
@@ -122,7 +122,7 @@ function MobileNavbar({
                     </Link>
                     <Link
                         to="/cai-dat"
-                        className={`flex items-center cursor-pointer p-4 hover:text-white ${
+                        className={`flex items-center cursor-pointer p-4 hover:text-[#b22222] ${
                             isActive("/cai-dat")
                                 ? "text-[#b22222] font-semibold"
                                 : "text-white"
@@ -134,7 +134,7 @@ function MobileNavbar({
                     </Link>
                     <Link
                         to="/thong-tin-he-thong"
-                        className={`flex items-center cursor-pointer p-4 hover:text-white ${
+                        className={`flex items-center cursor-pointer p-4 hover:text-[#b22222] ${
                             isActive("/thong-tin-he-thong")
                                 ? "text-[#b22222] font-semibold"
                                 : "text-white"
@@ -146,7 +146,7 @@ function MobileNavbar({
                     </Link>
                     <div
                         onClick={logout}
-                        className="flex items-center cursor-pointer p-4 hover:bg-gray-100 text-white"
+                        className="flex items-center cursor-pointer p-4  text-white"
                     >
                         <LogoutOutlined />
                         <span className="ml-2">{t("logout")}</span>
