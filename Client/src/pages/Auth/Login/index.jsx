@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { Button, Input, Form } from "antd";
 import { EyeInvisibleOutlined, EyeTwoTone } from "@ant-design/icons";
 import logoVN from "../../../assets/imgs/vietnam.png";
-import { accountnameRule, passwordRule } from "../../../utils/ rules";
 import { useDispatch } from "react-redux";
 import { addAuth } from "../../../store/reducers/authReducer";
 import handleAPI from "../../../api/handleAPI";
@@ -10,8 +9,10 @@ import { apiEndpoint } from "../../../constants/apiEndpoint";
 import "./Login.scss";
 import { localDataNames } from "../../../constants/appInfo";
 import { errorToast, successToast } from "../../../utils/toastConfig";
+import { getRules } from "../../../utils/rules";
 
-const Login = () => {
+const Login = ({ t }) => {
+    const { accountnameRule, passwordRule } = getRules(t);
     const [isloading, setIsloading] = useState(false);
     const [form] = Form.useForm();
     const dispatch = useDispatch();

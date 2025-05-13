@@ -1,6 +1,7 @@
 import React from "react";
 
 import {
+    ApartmentOutlined,
     DashboardOutlined,
     InfoCircleOutlined,
     LogoutOutlined,
@@ -10,7 +11,8 @@ import {
 } from "@ant-design/icons";
 import { GB, VN } from "country-flag-icons/react/3x2";
 import { Link, useLocation } from "react-router-dom";
-import { Drawer } from "antd";
+import { Card, Drawer } from "antd";
+import { localDataNames } from "../../../../constants/appInfo";
 
 function MobileNavbar({
     setIsDrawerOpen,
@@ -20,10 +22,16 @@ function MobileNavbar({
     changeLanguage,
     logout,
 }) {
+    const userInfo = JSON.parse(localStorage.getItem(localDataNames.authData));
     const location = useLocation();
     const pathname = location.pathname;
 
     const isActive = (path) => {
+        if (path === "/cai-dat") {
+            // Kiểm tra xem đường dẫn hiện tại có bắt đầu bằng "/cai-dat" không
+            return pathname === path || pathname.startsWith(`${path}/`);
+        }
+        // Đối với các đường dẫn khác, vẫn giữ kiểm tra chính xác
         return pathname === path;
     };
 
@@ -32,7 +40,12 @@ function MobileNavbar({
             title={
                 <div className="flex items-center gap-1 text-[1.6rem] text-white">
                     <UserOutlined />
-                    <span className="mt-1">Admin</span>
+                    <span
+                        title={userInfo?.accountname}
+                        className="mt-1 w-32 truncate inline-block"
+                    >
+                        {userInfo?.accountname}
+                    </span>
                 </div>
             }
             theme="dark"
@@ -81,6 +94,19 @@ function MobileNavbar({
             }
         >
             <div className="bg-[#2c2c2c] h-full">
+                <div className="border-b border-[#444444] bg-[#333333]">
+                    <Card
+                        size="small"
+                        className="bg-transparent border-none text-white text-center"
+                    >
+                        <span className="block font-medium text-[1.2rem] opacity-80">
+                            <ApartmentOutlined />
+                        </span>
+                        <span className="block font-semibold text-[1.4rem]">
+                            192.168.10.96
+                        </span>
+                    </Card>
+                </div>
                 <div className="p-4">
                     <Link
                         to="/bang-dieu-khien"
@@ -104,7 +130,7 @@ function MobileNavbar({
                         onClick={() => setIsDrawerOpen(false)}
                     >
                         <SettingOutlined />
-                        <span className="ml-2">{t("settings")}</span>
+                        <span className="ml-2">{t("settings.title")}</span>
                     </Link>
                     <Link
                         to="/thong-tin-he-thong"

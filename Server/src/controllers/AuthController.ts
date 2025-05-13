@@ -75,15 +75,25 @@ const updateAccount = async (req: any, res: any) => {
             });
         }
 
-        // Không cho phép cập nhật trường password và accountname qua API này
-        if (updateData.password || updateData.accountname) {
-            delete updateData.password;
+        // Không cho phép cập nhật trường accountname qua API này
+        if (updateData.accountname) {
             delete updateData.accountname;
-
             return res.status(400).json({
-                message:
-                    "Không được phép cập nhật mật khẩu hoặc tên tài khoản qua API này!",
+                message: "Không được phép cập nhật tên tài khoản qua API này!",
             });
+        }
+
+        // Kiểm tra và xử lý password nếu được cung cấp
+        if (updateData.password) {
+            // Kiểm tra độ mạnh của mật khẩu
+            if (!isValidPassword(updateData.password)) {
+                return res.status(400).json({
+                    message:
+                        "Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt",
+                });
+            }
+            // Mã hóa mật khẩu trước khi lưu
+            updateData.password = await hashPassword(updateData.password);
         }
 
         // Cập nhật thời gian updatedAt
@@ -149,6 +159,33 @@ const deleteAccount = async (req: any, res: any) => {
         });
     } catch (error) {
         console.error("Error deleting account:", error);
+        return res.status(500).json({ message: "Internal server error" });
+    }
+};
+
+// lấy tất cả tài khoản
+const getAllAccounts = async (req: any, res: any) => {
+    const adminUser = req.user;
+    try {
+        // Kiểm tra quyền admin
+        if (adminUser.role !== 1) {
+            return res.status(403).json({
+                message: "Bạn không có quyền truy cập vào chức năng này!",
+            });
+        }
+        // Lấy tất cả tài khoản từ cơ sở dữ liệu
+        const users = await UserModel.find({}).select("-password");
+        if (!users || users.length === 0) {
+            return res.status(404).json({
+                message: "Không tìm thấy tài khoản nào trong hệ thống!",
+            });
+        }
+        return res.status(200).json({
+            message: "Lấy danh sách tài khoản thành công!",
+            data: users,
+        });
+    } catch (error) {
+        console.error("Error getting all accounts:", error);
         return res.status(500).json({ message: "Internal server error" });
     }
 };
@@ -241,4 +278,11 @@ const resetPassword = async (req: any, res: any) => {
     }
 };
 
-export { createAccount, login, resetPassword, deleteAccount, updateAccount };
+export {
+    createAccount,
+    login,
+    resetPassword,
+    deleteAccount,
+    updateAccount,
+    getAllAccounts,
+};

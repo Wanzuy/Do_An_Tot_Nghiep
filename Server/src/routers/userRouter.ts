@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
     createAccount,
     deleteAccount,
+    getAllAccounts,
     login,
     resetPassword,
     updateAccount,
@@ -10,6 +11,7 @@ import { verifyToken } from "../middlewares/verifyToken";
 
 const router = Router();
 
+router.get("/", verifyToken, getAllAccounts);
 router.post("/", verifyToken, createAccount);
 router.put("/:userId", verifyToken, updateAccount);
 router.post("/login", login);

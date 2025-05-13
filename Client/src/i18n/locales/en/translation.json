@@ -1,6 +1,17 @@
 {
     "dashboard": "Dashboard",
-    "settings": "Settings",
+    "settings": {
+        "title": "Settings",
+        "falc": "Detector Supervision Module (FALC)",
+        "nac": "Alarm Control Module (NAC)",
+        "zone": "Management Zone",
+        "timer": "Timer",
+        "account": "Account Management",
+        "ip": "Change IP Address",
+        "cabinet": "Main Panel - Addressable Panel",
+        "simulation": "Fault Simulation Settings",
+        "reports": "Reports and Analytics"
+    },
     "information": "Information",
     "logout": "Logout",
     "info": {
@@ -9,8 +20,72 @@
         "version": "Version:",
         "reserve": "© 2025 Tinventor Electronics - All rights reserved."
     },
+    "AccountManagement": {
+        "title": "Account Management",
+        "accountname": "Account Name",
+        "accountnamePlaceholder": "Enter account name",
+        "password": "Password",
+        "passwordPlaceholder": "Enter password",
+        "showname": "Display Name",
+        "shownamePlaceholder": "Enter display name",
+        "role": "Role",
+        "rolePlaceholder": "Select role",
+        "editAccount": "Edit Account",
+        "add": "New Account",
+        "admin": "Administrator",
+        "operate": "System Operator",
+        "Technician": "Maintenance Technician",
+        "falc": "FALC Management",
+        "nac": "NAC Management",
+        "zone": "Zone Management",
+        "timer": "Timer Management",
+        "volume": "Volume Management",
+        "account": "Account Management",
+        "ip": "Change IP",
+        "cabinet": "Main Cabinet - Addressable",
+        "simulation": "Fault Simulation Settings",
+        "reports": "Reports and Analysis",
+        "status": "Status",
+        "passwordNew": "New Password",
+        "passwordNewPlaceholder": "Enter new password",
+        "unprivileged": "Unprivileged"
+    },
+    "ZonesManagement": {
+        "title": "Zone Management",
+        "add": "Add New Zone",
+        "zone": "Zone: ",
+        "edit": "Edit Zone",
+        "deleteWarning": "Are you sure you want to delete this zone? This action cannot be undone.",
+        "parentZone": "Parent Zone",
+        "parentZonePlaceholder": "Select Parent Zone",
+        "zoneName": "Zone Name",
+        "zoneNamePlaceholder": "Enter Zone Name",
+        "description": "Description",
+        "descriptionPlaceholder": "Enter Description"
+    },
     "404": {
         "message": "Sorry, the page you visited does not exist.",
         "back": "Back to Home"
+    },
+    "common": {
+        "cancel": "Cancel",
+        "save": "Save",
+        "add": "Add",
+        "addSuccess": "added successfully!",
+        "addError": "An error occurred while adding.",
+        "edit": "Edit",
+        "editSuccess": "Edited successfully!",
+        "editError": "An error occurred while editing.",
+        "delete": "Delete",
+        "confirmDelete": "Confirm Deletion",
+        "deleteWarning": "Are you sure you want to delete?",
+        "deleteSuccess": "Deleted successfully!",
+        "deleteError": "An error occurred while deleting.",
+        "noAccess": "You do not have access to this function."
+    },
+    "validation": {
+        "min6Chars": "Must be at least 6 characters!",
+        "required": "Please fill out this field!",
+        "passwordComplexity": "Password must be at least 8 characters long and include uppercase letters, lowercase letters, numbers, and special characters"
     }
 }

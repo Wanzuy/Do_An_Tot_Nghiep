@@ -25,6 +25,10 @@ const UserSchema = new Schema({
         required: true,
         trim: true,
     },
+    status: {
+        type: Boolean,
+        default: true,
+    },
     createdAt: {
         type: Date,
         default: Date.now,
@@ -32,10 +36,6 @@ const UserSchema = new Schema({
     updatedAt: {
         type: Date,
         default: Date.now,
-    },
-    status: {
-        type: Boolean,
-        default: true,
     },
 });
 

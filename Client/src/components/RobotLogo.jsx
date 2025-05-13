@@ -5,7 +5,13 @@ const RobotLogo = () => {
     const lightColor = "#ffffff";
 
     return (
-        <svg viewBox="0 0 200 200" width="400" height="400">
+        <svg
+            viewBox="0 0 200 200"
+            width="100%"
+            height="auto"
+            style={{ maxWidth: "300px" }}
+            preserveAspectRatio="xMidYMid meet"
+        >
             {/* Thân robot - hình chữ nhật đơn giản */}
             <rect
                 x="50"

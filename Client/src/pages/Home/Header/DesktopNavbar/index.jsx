@@ -12,16 +12,21 @@ function DesktopNavbar({ t }) {
     const location = useLocation();
     const [selectedKey, setSelectedKey] = useState("1");
 
-    const pathToKey = {
-        "/": "1",
-        "/cai-dat": "2",
-        "/thong-tin-he-thong": "3",
-    };
-
     useEffect(() => {
+        // Get current path
         const path = location.pathname;
-        const key = pathToKey[path] || "1";
-        setSelectedKey(key);
+
+        // Determine which key to select based on path prefix
+        if (path === "/" || path.startsWith("/bang-dieu-khien")) {
+            setSelectedKey("1");
+        } else if (path.startsWith("/cai-dat")) {
+            setSelectedKey("2");
+        } else if (path.startsWith("/thong-tin-he-thong")) {
+            setSelectedKey("3");
+        } else {
+            // Default to dashboard for any other route
+            setSelectedKey("1");
+        }
     }, [location.pathname]);
 
     const handleMenuClick = (key) => {
@@ -39,6 +44,7 @@ function DesktopNavbar({ t }) {
                 navigate("/bang-dieu-khien");
         }
     };
+
     return (
         <Menu
             theme="dark"
@@ -61,7 +67,7 @@ function DesktopNavbar({ t }) {
                 {
                     key: "2",
                     icon: <SettingOutlined />,
-                    label: t("settings"),
+                    label: t("settings.title"),
                     style: {
                         backgroundColor: "rgba(0, 0, 0, 0.2)",
                         margin: "0 5px",

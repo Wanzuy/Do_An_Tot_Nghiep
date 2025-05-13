@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import connectDB from "./src/database/connect";
 import userRouter from "./src/routers/userRouter";
+import zoneRouter from "./src/routers/zoneRouter";
 
 dotenv.config();
 
@@ -13,6 +14,7 @@ app.use(express.json());
 app.use(cors());
 
 app.use("/auth", userRouter);
+app.use("/zones", zoneRouter);
 
 connectDB()
     .then(() => {

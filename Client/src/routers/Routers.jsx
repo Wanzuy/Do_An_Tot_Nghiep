@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import Dashboard from "../pages/Home/Dashboard";
@@ -14,11 +14,34 @@ import { addAuth, authSelector } from "../store/reducers/authReducer";
 import { localDataNames } from "../constants/appInfo";
 import { useTranslation } from "react-i18next";
 import "../styles/mainRouter.scss";
+import AccountManagement from "../pages/Settings/AccountManagement";
+import { errorToast } from "../utils/toastConfig";
+import ZonesManagement from "../pages/Settings/ZonesManagement";
+
+const ProtectedRoute = ({ element, requiredRole }) => {
+    const auth = useSelector(authSelector);
+
+    if (!auth || !auth.token) {
+        errorToast("Bạn cần đăng nhập để truy cập trang này!");
+        return <Navigate to="/" replace />;
+    }
+
+    const requiredRoles = Array.isArray(requiredRole)
+        ? requiredRole
+        : [requiredRole];
+
+    if (!requiredRoles.includes(Number(auth.role))) {
+        return <Navigate to="/cai-dat" replace />;
+    }
+
+    return element;
+};
 
 const Routers = () => {
     const auth = useSelector(authSelector);
     const dispatch = useDispatch();
     const { t, i18n } = useTranslation();
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         getDatas();
@@ -29,17 +52,27 @@ const Routers = () => {
         if (data) {
             dispatch(addAuth(JSON.parse(data)));
         }
+        setIsLoading(false);
     };
+
+    if (isLoading) {
+        return (
+            <div className="flex items-center justify-center min-h-screen bg-[#333333]">
+                {/* Hiệu ứng loading tùy chọn */}
+                <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-red-500"></div>
+            </div>
+        );
+    }
 
     return (
         <HelmetProvider>
             <BrowserRouter>
                 {auth.token ? (
-                    <Layout className="header-main min-h-screen">
+                    <Layout className="min-h-screen">
                         <Header t={t} i18n={i18n} />
                         <Content
                             className="custom-scrollbar overflow-y-auto bg-[#333333]"
-                            style={{ height: "calc(100vh - 63px)" }}
+                            style={{ height: "calc(100vh - 64px)" }}
                         >
                             <Routes>
                                 <Route
@@ -50,7 +83,30 @@ const Routers = () => {
                                     path="/bang-dieu-khien"
                                     element={<Dashboard />}
                                 />
-                                <Route path="/cai-dat" element={<Settings />} />
+                                <Route
+                                    path="/cai-dat"
+                                    element={<Settings t={t} />}
+                                />
+                                <Route
+                                    path="/cai-dat/quan-ly-tai-khoan"
+                                    element={
+                                        <ProtectedRoute
+                                            element={
+                                                <AccountManagement t={t} />
+                                            }
+                                            requiredRole={1}
+                                        />
+                                    }
+                                />
+                                <Route
+                                    path="/cai-dat/quan-ly-phan-vung"
+                                    element={
+                                        <ProtectedRoute
+                                            element={<ZonesManagement t={t} />}
+                                            requiredRole={[1, 2]}
+                                        />
+                                    }
+                                />
                                 <Route
                                     path="/thong-tin-he-thong"
                                     element={<Information t={t} />}
@@ -68,7 +124,7 @@ const Routers = () => {
                     </Layout>
                 ) : (
                     <Routes>
-                        <Route path="/" element={<Login />} />
+                        <Route path="/" element={<Login t={t} />} />
                         <Route path="*" element={<Navigate to="/" replace />} />
                     </Routes>
                 )}
