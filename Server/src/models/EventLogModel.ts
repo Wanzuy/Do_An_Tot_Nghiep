@@ -9,22 +9,18 @@ const eventLogSchema = new Schema(
             default: Date.now,
         },
         event_type: {
-            // Loại sự kiện (ví dụ: 'Alarm' (báo động), 'Fault' (lỗi), 'Restore' (khôi phục), 'Activation' (kích hoạt), 'Deactivation' (vô hiệu hóa), 'StatusChange' (thay đổi trạng thái), 'ConfigChange' (thay đổi cấu hình), 'UserAction' (hành động của người dùng), 'Login' (đăng nhập), 'Logout' (đăng xuất), 'System' (hệ thống))
+            // Loại sự kiện (ví dụ: 'Alarm' (báo động), 'Fault' (lỗi), 'Restore' (khôi phục), 'Activation' (kích hoạt), 'Deactivation' (vô hiệu hóa), 'StatusChange' (thay đổi trạng thái), 'ConfigChange' (thay đổi cấu hình))
             type: String,
             required: true,
             enum: [
-                "Alarm",
+                "Fire Alarm",
                 "Fault",
                 "Restore",
                 "Activation",
                 "Deactivation",
                 "StatusChange",
                 "ConfigChange",
-                "UserAction",
-                "Login",
-                "Logout",
-                "System",
-            ], // Các loại phổ biến
+            ],
         },
         description: {
             // Mô tả chi tiết về sự kiện
@@ -33,10 +29,10 @@ const eventLogSchema = new Schema(
             trim: true,
         },
         source_type: {
-            // Loại nguồn gây ra sự kiện hoặc liên quan đến sự kiện (ví dụ: 'Detector', 'NAC', 'Panel', 'User', 'System')
+            // Loại nguồn gây ra sự kiện hoặc liên quan đến sự kiện (ví dụ: 'Detector', 'NAC')
             type: String,
             required: true,
-            enum: ["Detector", "NAC", "Panel", "User", "System"], // Các loại nguồn
+            enum: ["Detector", "NAC", "Panel"],
         },
         source_id: {
             // ID của nguồn cụ thể (liên kết tới document Detector, NacCircuit, Panel, User tương ứng)

@@ -8,15 +8,15 @@ const nacCircuitSchema = new Schema(
             ref: "nacboards", // Tham chiếu đến collection 'nacboards'
             required: true,
         },
+        name: {
+            // Tên mạch, ví dụ: NAC Circuit 1
+            type: String,
+            trim: true,
+        },
         circuit_number: {
             // Số thứ tự mạch trên bo mạch (ví dụ: 1, 2)
             type: Number,
             required: true,
-        },
-        description: {
-            // Mô tả mạch, ví dụ: Chuong bao dong Tang 1, Den bao chay hanh lang
-            type: String,
-            trim: true,
         },
         is_active: {
             // Trạng thái hoạt động của mạch
@@ -32,8 +32,8 @@ const nacCircuitSchema = new Schema(
         output_type: {
             // Loại thiết bị đầu ra (Audible - Chuong, Visual - Den, etc.) - Đã sửa tên trường
             type: String,
-            enum: ["Audible", "Visual", "Audible/Visual", "Relay", "Other"],
-            default: "Audible/Visual",
+            enum: ["Audible", "Visual", "Relay", "Other"],
+            default: "Audible",
         },
         zoneId: {
             // Liên kết đến Phân vùng (Zone) mà mạch này phục vụ
@@ -41,8 +41,6 @@ const nacCircuitSchema = new Schema(
             ref: "zones", // Đã sửa ref thành "zones"
             required: true,
         },
-        // Có thể thêm trường volume nếu điều chỉnh âm lượng theo mạch
-        // volume: { type: Number, min: 0, max: 100, default: 50 }
     },
     {
         timestamps: true,

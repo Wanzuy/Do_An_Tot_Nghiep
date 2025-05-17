@@ -241,7 +241,6 @@ export const updateNacBoard = async (req: any, res: any) => {
 
 /**
  * Delete NAC board by ID
- * @route DELETE /api/nac-boards/:id
  */
 export const deleteNacBoard = async (req: any, res: any) => {
     try {
@@ -300,7 +299,6 @@ export const deleteNacBoard = async (req: any, res: any) => {
 
 /**
  * Get all NAC boards by panel ID
- * @route GET /api/panels/:panelId/nac-boards
  */
 export const getNacBoardsByPanelId = async (req: any, res: any) => {
     try {

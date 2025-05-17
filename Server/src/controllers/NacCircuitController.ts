@@ -63,7 +63,7 @@ export const createNacCircuit = async (req: any, res: any) => {
 
         res.status(201).json({
             success: true,
-            message: "Tạo Mạch NAC thành công.",
+            message: "Tạo Mạch NACcircuit thành công.",
             data: result,
         });
     } catch (error: any) {
@@ -304,68 +304,6 @@ export const updateNacCircuit = async (req: any, res: any) => {
             return;
         }
 
-        // --- Tích hợp ghi Log sự kiện tại đây (nếu status thay đổi qua hàm này) ---
-        // Chỉ ghi log nếu originalCircuit tồn tại và status đã thay đổi
-        // if (
-        //     originalCircuit &&
-        //     originalCircuit.status !== updatedCircuit.status
-        // ) {
-        //     const eventType =
-        //         updatedCircuit.status === "Active"
-        //             ? "Activation"
-        //             : updatedCircuit.status === "Fault"
-        //             ? "Fault"
-        //             : originalCircuit.status === "Active"
-        //             ? "Deactivation"
-        //             : originalCircuit.status === "Fault"
-        //             ? "Restore"
-        //             : "StatusChange"; // Xác định loại log (Activation, Fault, Deactivation, Restore, StatusChange)
-
-        //     let description = `Trạng thái Mạch NAC số ${updatedCircuit.circuit_number} thay đổi từ "${originalCircuit.status}" sang "${updatedCircuit.status}".`;
-        //     if (eventType === "Activation")
-        //         description = `Kích hoạt Mạch NAC số ${updatedCircuit.circuit_number}`;
-        //     if (eventType === "Fault")
-        //         description = `Lỗi tại Mạch NAC số ${updatedCircuit.circuit_number}`;
-        //     if (
-        //         eventType === "Deactivation" &&
-        //         updatedCircuit.status === "Disabled"
-        //     )
-        //         description = `Hủy kích hoạt Mạch NAC số ${updatedCircuit.circuit_number}`;
-        //     if (eventType === "Restore" && updatedCircuit.status === "Normal")
-        //         description = `Khôi phục trạng thái bình thường cho Mạch NAC số ${updatedCircuit.circuit_number}`;
-
-        //     // Lấy panelId và zoneId từ document đã được populate
-        //     // Cần kiểm tra null/undefined an toàn hơn trong JS thuần
-        //     const panelId = updatedCircuit.nacBoardId
-        //         ? (updatedCircuit.nacBoardId as any).panelId
-        //         : null;
-        //     const zoneId = updatedCircuit.zoneId
-        //         ? (updatedCircuit.zoneId as any)._id
-        //         : null; // ZoneId ở đây là populated object, lấy _id
-
-        //     // Xác định trạng thái log ('Active' cho Active/Fault, 'Info' cho Normal/Disabled)
-        //     const logStatus =
-        //         updatedCircuit.status === "Active" ||
-        //         updatedCircuit.status === "Fault"
-        //             ? "Active"
-        //             : "Info";
-
-        //     // Gọi hàm ghi log
-        //     await createEventLog(
-        //         eventType,
-        //         description,
-        //         "NAC", // Loại nguồn
-        //         updatedCircuit._id, // ID nguồn
-        //         zoneId, // ID Zone
-        //         panelId, // ID Panel
-        //         logStatus, // Trạng thái log
-        //         {
-        //             /* Có thể thêm chi tiết khác nếu cần */
-        //         }
-        //     );
-        // }
-        // --- Kết thúc tích hợp ghi Log ---
-
         res.status(200).json({
             success: true,
             message: "Cập nhật thông tin Mạch NAC thành công.",
@@ -410,7 +348,8 @@ export const activateCircuit = async (req: any, res: any) => {
         if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
             return res.status(404).json({
                 success: false,
-                message: "Không tìm thấy Mạch NAC với ID " + req.params.id,
+                message:
+                    "Không tìm thấy Mạch NACcircuit với ID " + req.params.id,
             });
         }
 
@@ -488,10 +427,7 @@ export const activateCircuit = async (req: any, res: any) => {
                 updatedCircuit._id, // ID nguồn
                 zoneId, // ID Zone
                 panelId, // ID Panel
-                logStatus, // Trạng thái log
-                {
-                    /* chi tiết */
-                }
+                logStatus // Trạng thái log
             );
         }
         // --- KẾT THÚC GHI LOG ---

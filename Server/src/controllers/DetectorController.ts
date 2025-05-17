@@ -24,8 +24,9 @@ export const createDetector = async (req: any, res: any) => {
                 success: false,
                 message: "Zone ID không hợp lệ hoặc bị thiếu.",
             });
-        } // Kiểm tra falcBoardId và zoneId có tồn tại không
+        }
 
+        // Kiểm tra falcBoardId và zoneId có tồn tại không
         const falcBoard = await FalcBoardModel.findById(req.body.falcBoardId);
         if (!falcBoard) {
             return res.status(404).json({
@@ -41,16 +42,68 @@ export const createDetector = async (req: any, res: any) => {
                 success: false,
                 message: "Không tìm thấy Vùng (Zone) với ID " + req.body.zoneId,
             });
-        } // Tạo Detector mới bằng cách truyền trực tiếp req.body
+        }
 
+        // --- Bổ sung: Kiểm tra giới hạn của FalcBoard ---
+
+        const requestedLoop = req.body.loop_number;
+        const requestedAddress = req.body.detector_address;
+        const maxLoops = falcBoard.loop_count;
+        const maxDetectorsPerLoop = falcBoard.number_of_detectors; // Giới hạn thiết bị trên MỖI vòng
+
+        // 1. Kiểm tra loop_number có hợp lệ với số vòng lặp của bo mạch không
+        if (requestedLoop < 1 || requestedLoop > maxLoops) {
+            return res.status(400).json({
+                success: false,
+                message: `Số vòng lặp (${requestedLoop}) không hợp lệ cho bo mạch FALC "${falcBoard.name}". Số vòng lặp hợp lệ từ 1 đến ${maxLoops}.`,
+            });
+        }
+
+        // 2. Kiểm tra detector_address có nằm trong giới hạn địa chỉ trên mỗi vòng lặp không
+        // Giả sử địa chỉ bắt đầu từ 1
+        if (requestedAddress < 1 || requestedAddress > maxDetectorsPerLoop) {
+            return res.status(400).json({
+                success: false,
+                message: `Địa chỉ đầu báo (${requestedAddress}) nằm ngoài giới hạn cho phép trên mỗi vòng lặp của bo mạch FALC "${falcBoard.name}". Địa chỉ hợp lệ từ 1 đến ${maxDetectorsPerLoop}.`,
+            });
+        }
+
+        // 3. Kiểm tra số lượng đầu báo hiện tại trên vòng lặp này để không vượt quá giới hạn
+        const existingDetectorsCountOnLoop = await DetectorModel.countDocuments(
+            {
+                falcBoardId: req.body.falcBoardId,
+                loop_number: requestedLoop,
+            }
+        );
+
+        if (existingDetectorsCountOnLoop >= maxDetectorsPerLoop) {
+            return res.status(400).json({
+                success: false,
+                message: `Vòng lặp ${requestedLoop} của bo mạch FALC "${falcBoard.name}" đã đạt số lượng thiết bị tối đa (${maxDetectorsPerLoop}). Không thể thêm đầu báo mới vào vòng lặp này.`,
+            });
+        }
+
+        // --- Kết thúc kiểm tra giới hạn ---
+
+        // Tạo Detector mới bằng cách truyền trực tiếp req.body
         const newDetector = new DetectorModel(req.body); // Mongoose sẽ tự động lấy các trường trong schema
         newDetector.last_reported_at = new Date(); // Cập nhật thời gian báo cáo khi tạo
 
-        const savedDetector = await newDetector.save(); // Lưu vào database
+        // Lưu vào database
+        const savedDetector = await newDetector.save();
+
+        // --- Bổ sung: Cập nhật số lượng đầu báo trên FalcBoard (nếu bạn có trường đó) ---
+        // Nếu bạn có trường 'current_detector_count' trên FalcBoardModel
+        // falcBoard.current_detector_count = (falcBoard.current_detector_count || 0) + 1;
+        // await falcBoard.save();
+        // --- Kết thúc Bổ sung ---
 
         // Populate các trường liên kết trước khi trả về
         const result = await DetectorModel.findById(savedDetector._id)
-            .populate("falcBoardId", "name panelId")
+            .populate(
+                "falcBoardId",
+                "name panelId loop_count number_of_detectors"
+            ) // Populate thêm thông tin FalcBoard
             .populate("zoneId", "name description");
 
         res.status(201).json({
@@ -59,7 +112,8 @@ export const createDetector = async (req: any, res: any) => {
             data: result,
         });
     } catch (error: any) {
-        console.error("Lỗi khi tạo đầu báo:", error); // Xử lý lỗi unique index kết hợp (falcBoardId + loop_number + detector_address)
+        console.error("Lỗi khi tạo đầu báo:", error);
+        // Xử lý lỗi unique index kết hợp (falcBoardId + loop_number + detector_address)
         if (error.code === 11000) {
             res.status(400).json({
                 success: false,
@@ -73,7 +127,7 @@ export const createDetector = async (req: any, res: any) => {
                 message: "Lỗi xác thực dữ liệu: " + error.message,
             });
         } else if (error.kind === "ObjectId") {
-            // Lỗi CastError cho các ID trong body
+            // Lỗi CastError cho các ID trong body (đã check isValid ở trên, đây là fallback)
             return res.status(400).json({
                 success: false,
                 message: "Định dạng ID không hợp lệ cho FalcBoard hoặc Zone.",
@@ -342,6 +396,7 @@ export const updateDetectorStatus = async (req: any, res: any) => {
             return;
         } // Validate status
 
+        // Cập nhật danh sách trạng thái hợp lệ theo schema mới nhất
         const validStatuses = ["Normal", "Alarm", "Fault", "Disabled"];
         if (!validStatuses.includes(status)) {
             res.status(400).json({
@@ -353,16 +408,26 @@ export const updateDetectorStatus = async (req: any, res: any) => {
             return;
         }
 
-        // Lấy thông tin đầu báo hiện tại để so sánh trạng thái cũ
-        const detector: any = await DetectorModel.findById(
-            req.params.id
-        ).populate("falcBoardId", "panelId"); // Lấy board và panelId để ghi log
+        // Lấy thông tin đầu báo hiện tại để so sánh trạng thái cũ và lấy thông tin cho log
+        // Populate thêm zoneId để có tên zone cho log
+        const detector: any = await DetectorModel.findById(req.params.id)
+            .populate("falcBoardId", "panelId loop_number") // Populate FalcBoard và thêm loop_number
+            .populate("zoneId", "name"); // Populate Zone
 
         if (!detector) {
             return res.status(404).json({
                 success: false,
                 message: "Không tìm thấy đầu báo với ID " + req.params.id,
             });
+        }
+
+        // Kiểm tra detector_type có hợp lệ theo enum mới không (nếu dữ liệu cũ tồn tại type khác)
+        const validDetectorTypes = ["Smoke", "Heat", "Gas"];
+        if (!validDetectorTypes.includes(detector.detector_type)) {
+            console.warn(
+                `Đầu báo ${detector._id} có detector_type không hợp lệ theo schema mới: ${detector.detector_type}. Cần cập nhật dữ liệu cũ.`
+            );
+            // Tùy chọn: có thể dừng xử lý hoặc gán một giá trị default/Other nếu schema cho phép
         }
 
         const oldStatus = detector.status; // Trạng thái cũ
@@ -376,34 +441,73 @@ export const updateDetectorStatus = async (req: any, res: any) => {
 
         // --- GHI LOG SỰ KIỆN ---
         if (oldStatus !== updatedDetector.status) {
-            const eventType =
+            const eventType: any =
                 updatedDetector.status === "Alarm"
-                    ? "Alarm"
+                    ? "Fire Alarm"
                     : updatedDetector.status === "Fault"
                     ? "Fault"
                     : oldStatus === "Alarm" || oldStatus === "Fault"
                     ? "Restore"
-                    : "StatusChange"; // Xác định loại log (Alarm, Fault, Restore, StatusChange)
+                    : "Status Change";
 
             let description = `Trạng thái đầu báo "${
                 updatedDetector.name || updatedDetector.detector_address
-            }" thay đổi từ "${oldStatus}" sang "${updatedDetector.status}".`;
-            if (eventType === "Alarm")
-                description = `Báo động tại đầu báo "${
-                    updatedDetector.name || updatedDetector.detector_address
-                }"`;
-            if (eventType === "Fault")
-                description = `Lỗi tại đầu báo "${
-                    updatedDetector.name || updatedDetector.detector_address
-                }"`;
-            if (eventType === "Restore" && updatedDetector.status === "Normal")
-                description = `Khôi phục trạng thái bình thường cho đầu báo "${
-                    updatedDetector.name || updatedDetector.detector_address
-                }"`;
+            }" thay đổi từ: "${oldStatus}" sang: "${updatedDetector.status}".`;
+
+            const detectorAddress = updatedDetector.detector_address;
+            const detectorName = updatedDetector.name;
+            const detectorType = updatedDetector.detector_type;
+            const loopInfo =
+                updatedDetector && updatedDetector.loop_number
+                    ? `Vòng ${updatedDetector.loop_number}`
+                    : "";
+            const fullDetectorInfo = `${detectorType} "${
+                detectorName || detectorAddress
+            }" (${loopInfo}, Địa chỉ: ${detectorAddress})`;
+            const zoneName =
+                updatedDetector.zoneId && updatedDetector.zoneId.name
+                    ? ` tại khu vực(zone): "${updatedDetector.zoneId.name}"`
+                    : "";
+            const readingInfo =
+                updatedDetector.last_reading !== undefined &&
+                updatedDetector.last_reading !== null
+                    ? ` (Giá trị: ${updatedDetector.last_reading})`
+                    : "";
+
+            if (eventType === "Fire Alarm") {
+                // Điều chỉnh logic mô tả dựa trên enum detector_type mới
+                if (detectorType === "Smoke") {
+                    description = `BÁO ĐỘNG CHÁY: Phát hiện khói ${readingInfo} từ ${fullDetectorInfo}${zoneName}.`;
+                } else if (detectorType === "Heat") {
+                    description = `BÁO ĐỘNG CHÁY: Nhiệt độ tăng cao ${readingInfo} được phát hiện bởi ${fullDetectorInfo}${zoneName}.`;
+                } else if (detectorType === "Gas") {
+                    description = `BÁO ĐỘNG KHÍ GAS: Phát hiện rò rỉ khí gas: ${readingInfo} từ ${fullDetectorInfo}${zoneName}.`;
+                }
+                // Nếu detector_type không thuộc enum mới, description sẽ là mặc định hoặc cần xử lý thêm
+                else {
+                    description = `BÁO ĐỘNG CHÁY: Sự kiện báo động từ ${fullDetectorInfo}${zoneName}${readingInfo}.`;
+                }
+            } else if (eventType === "Fault") {
+                // Điều chỉnh logic mô tả lỗi bao gồm Địa chỉ
+                description = `LỖI THIẾT BỊ: ${fullDetectorInfo}${zoneName} báo lỗi${readingInfo}.`;
+                // Có thể thêm logic chi tiết hơn về loại lỗi nếu có thông tin (ví dụ: đứt dây, lỗi cảm biến...)
+            } else if (
+                eventType === "Restore" &&
+                updatedDetector.status === "Normal"
+            ) {
+                if (oldStatus === "Alarm") {
+                    description = `KHÔI PHỤC: Trạng thái báo động cháy đã được xóa cho ${fullDetectorInfo}${zoneName}.`;
+                } else if (oldStatus === "Fault") {
+                    description = `KHÔI PHỤC: Lỗi thiết bị đã được khắc phục cho ${fullDetectorInfo}${zoneName}.`;
+                } else {
+                    description = `KHÔI PHỤC: ${fullDetectorInfo}${zoneName} trở về trạng thái bình thường.`;
+                }
+            }
+            // EventType "Status Change" sẽ giữ mô tả mặc định nếu không rơi vào các trường hợp trên
 
             // Lấy panelId từ falcBoardId đã populate
             const panelId = updatedDetector.falcBoardId
-                ? updatedDetector.falcBoardId.panelId
+                ? (updatedDetector.falcBoardId as any).panelId
                 : null;
 
             // Xác định trạng thái log ('Active' cho Alarm/Fault, 'Info' cho Restore/Normal)
@@ -419,18 +523,36 @@ export const updateDetectorStatus = async (req: any, res: any) => {
                 description,
                 "Detector", // Loại nguồn
                 updatedDetector._id, // ID nguồn
-                updatedDetector.zoneId, // ID Zone
+                updatedDetector.zoneId
+                    ? (updatedDetector.zoneId as any)._id
+                    : null, // ID Zone
                 panelId, // ID Panel
                 logStatus, // Trạng thái log
-                { last_reading: updatedDetector.last_reading } // Thông tin chi tiết thêm
+                {
+                    last_reading: updatedDetector.last_reading,
+                    old_status: oldStatus,
+                    new_status: updatedDetector.status,
+                    detector_address: updatedDetector.detector_address, // Thêm địa chỉ vào details
+                    loop_number: updatedDetector.falcBoardId
+                        ? updatedDetector.falcBoardId.loop_number
+                        : null, // Thêm số vòng lặp vào details
+                }
             );
         }
         // --- KẾT THÚC GHI LOG ---
 
+        // Populate lại đầy đủ thông tin cho response sau khi save
+        const finalDetector = await DetectorModel.findById(updatedDetector._id)
+            .populate({
+                path: "falcBoardId",
+                populate: { path: "panelId", select: "name panel_type" },
+            })
+            .populate("zoneId", "name description");
+
         res.status(200).json({
             success: true,
             message: "Cập nhật trạng thái đầu báo thành công.",
-            data: updatedDetector,
+            data: finalDetector,
         });
     } catch (error: any) {
         console.error("Lỗi khi cập nhật trạng thái đầu báo:", error);
@@ -445,11 +567,11 @@ export const updateDetectorStatus = async (req: any, res: any) => {
             success: false,
             message:
                 error.message ||
-                "Lỗi khi cập nhật trạng thái đầu báo với ID " + req.params.id,
+                "Đã xảy ra lỗi khi cập nhật trạng thái đầu báo với ID " +
+                    req.params.id,
         });
     }
 };
-
 /**
  * Delete detector by ID
  */

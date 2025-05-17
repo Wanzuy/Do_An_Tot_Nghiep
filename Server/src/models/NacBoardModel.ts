@@ -24,10 +24,16 @@ const nacBoardSchema = new Schema(
             default: true,
         },
         status: {
-            // Trạng thái hiện tại của bo mạch (Normal, Fault, Offline) - Giả lập
+            // Trạng thái hiện tại của bo mạch (Normal (Bo mạch đang hoạt động bình thường, không có lỗi), Fault(Bo mạch đang gặp sự cố hoặc lỗi, nhưng vẫn có kết nối), Offline (bo mạch không kết nối được với hệ thống, có thể do mất điện, đứt kết nối, hoặc bị tắt)) - Giả lập
             type: String,
             enum: ["Normal", "Fault", "Offline"],
             default: "Normal",
+        },
+        circuit_count: {
+            // circuit_count để lưu số lượng mạch NAC trên bo mạch này
+            type: Number,
+            required: true,
+            min: 1,
         },
     },
     {

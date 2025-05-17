@@ -17,7 +17,7 @@ router.get("/falcboards/:falcBoardId/detectors", getDetectorsByFalcBoardId);
 router.get("/zones/:zoneId/detectors", getDetectorsByZoneId);
 router.post("/", createDetector);
 router.put("/:id", updateDetector);
-router.patch("/detectors/:id/status", updateDetectorStatus);
+router.patch("/:id/status", updateDetectorStatus);
 router.delete("/:id", deleteDetector);
 
 export default router;

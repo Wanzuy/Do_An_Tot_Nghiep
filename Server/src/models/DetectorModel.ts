@@ -23,15 +23,10 @@ const detectorSchema = new Schema(
             type: String,
             trim: true,
         },
-        description: {
-            // Mô tả vị trí cụ thể, ví dụ: Trần phòng 201A, canh cua ra vao
-            type: String,
-            trim: true,
-        },
         detector_type: {
-            // Loại đầu báo (Smoke (Khói), Heat (Nhiệt), Manual Call Point (Gọi khẩn cấp), Gas (Khí gas), Other (Khác))
+            // Loại đầu báo (Smoke (Khói), Heat (Nhiệt), Gas (Khí gas))
             type: String,
-            enum: ["Smoke", "Heat", "Manual Call Point", "Gas", "Other"],
+            enum: ["Smoke", "Heat", "Gas"],
             required: true,
         },
         zoneId: {
@@ -41,7 +36,7 @@ const detectorSchema = new Schema(
             required: true,
         },
         status: {
-            // Trạng thái hiện tại (Normal (Đầu báo đang hoạt động bình thường, không có lỗi), Alarm (Đầu báo phát hiện sự cố, cảnh báo), Fault (Đầu báo gặp sự cố hoặc lỗi, nhưng vẫn có kết nối), Disabled (Đầu báo bị tắt hoặc không hoạt động))
+            // Trạng thái hiện tại (Normal (Đầu báo đang hoạt động bình thường, không có lỗi), Alarm (Đầu báo phát hiện sự cố, cảnh báo), Fault (Đầu báo gặp sự cố hoặc lỗi), Disabled (Đầu báo bị tắt hoặc không hoạt động))
             type: String,
             enum: ["Normal", "Alarm", "Fault", "Disabled"],
             default: "Normal",
