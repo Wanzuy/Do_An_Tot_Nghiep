@@ -7,10 +7,9 @@
         "zone": "Phân vùng quản lý (Zone)",
         "timer": "Đồng hồ hẹn giờ",
         "account": "Quản lý tài khoản",
-        "ip": "Đổi địa chỉ IP",
+        "volume": "Quản lý âm lượng",
         "cabinet": "Tủ trung tâm - Tủ địa chỉ",
-        "simulation": "Cài đặt mô phỏng sự cố",
-        "reports": "Báo cáo và phân tích"
+        "problem": "Quản lý sự cố"
     },
     "information": "Thông tin",
     "logout": "Đăng xuất",
@@ -43,7 +42,7 @@
         "account": "Quản lý tài khoản",
         "ip": "Đổi IP",
         "cabinet": "Tủ trung tâm - địa chỉ",
-        "simulation": "Cài đặt mô phỏng sự cố",
+        "incident": "Quản lý sự cố",
         "reports": "Báo cáo phân tích",
         "status": "Trạng thái",
         "passwordNew": "Mật khẩu mới",
@@ -63,6 +62,23 @@
         "description": "Mô tả",
         "descriptionPlaceholder": "Nhập mô tả"
     },
+    "cabinet": {
+        "title": "Tủ trung tâm - Tủ địa chỉ",
+        "detailTitle": "Thông tin chi tiết",
+        "mainPanelName": "Tên tủ trung tâm",
+        "AddressablePanel": "Tủ địa chỉ",
+        "MainPanel": "Tủ trung tâm",
+        "name": "Tên tủ",
+        "namePlaceholder": "Nhập tên tủ",
+        "type": "Loại tủ",
+        "location": "Vị trí",
+        "locationPlaceholder": "Nhập vị trí",
+        "status": "Trạng thái",
+        "options": "Thao tác",
+        "editTitle": "Cấu hình tủ",
+        "ipAddress": "Địa chỉ IP tủ trung tâm",
+        "ipAddressPlaceholder": "Nhập địa chỉ IP tủ trung tâm (vd: 192.168.1.1)"
+    },
     "404": {
         "message": "Xin lỗi, trang bạn đã truy cập không tồn tại.",
         "back": "Quay lại trang chủ"
@@ -81,7 +97,12 @@
         "deleteWarning": "Bạn có chắc chắn muốn xóa không?",
         "deleteSuccess": "Đã xóa thành công!",
         "deleteError": "Đã xảy ra lỗi khi xóa .",
-        "noAccess": "Bạn không có quyền truy cập vào chức năng này."
+        "noAccess": "Bạn không có quyền truy cập vào chức năng này.",
+        "total": "Tổng số",
+        "record": "bản ghi",
+        "config": "Cấu hình",
+        "detail": "Chi tiết",
+        "invalidIPAddress": "Địa chỉ IP không hợp lệ"
     },
     "validation": {
         "min6Chars": "Phải có ít nhất 6 ký tự !",

@@ -39,6 +39,15 @@ function Settings({ t }) {
             } else {
                 errorToast(t("common.noAccess"));
             }
+        } else if (url === "/cai-dat/tu-trung-tam-tu-dia-chi") {
+            if (
+                userInfo &&
+                (Number(userInfo.role) === 1 || Number(userInfo.role) === 2)
+            ) {
+                navigate(url);
+            } else {
+                errorToast(t("common.noAccess"));
+            }
         } else {
             // Các trang khác không cần kiểm tra quyền
             navigate(url);

@@ -7,10 +7,9 @@
         "zone": "Management Zone",
         "timer": "Timer",
         "account": "Account Management",
-        "ip": "Change IP Address",
+        "volume": "Volume Management",
         "cabinet": "Main Panel - Addressable Panel",
-        "simulation": "Fault Simulation Settings",
-        "reports": "Reports and Analytics"
+        "problem": "Incident Management"
     },
     "information": "Information",
     "logout": "Logout",
@@ -43,7 +42,7 @@
         "account": "Account Management",
         "ip": "Change IP",
         "cabinet": "Main Cabinet - Addressable",
-        "simulation": "Fault Simulation Settings",
+        "incident": "Incident Management",
         "reports": "Reports and Analysis",
         "status": "Status",
         "passwordNew": "New Password",
@@ -63,6 +62,23 @@
         "description": "Description",
         "descriptionPlaceholder": "Enter Description"
     },
+    "cabinet": {
+        "title": "Main Panel - Addressable Panel",
+        "detailTitle": "Information details",
+        "mainPanelName": "Main Panel Name",
+        "AddressablePanel": "Addressable Panel",
+        "MainPanel": "Main Panel",
+        "name": "Panel Name",
+        "namePlaceholder": "Enter panel name",
+        "type": "Panel Type",
+        "location": "Location",
+        "locationPlaceholder": "Enter location",
+        "status": "Status",
+        "options": "Options",
+        "editTitle": "Panel Config",
+        "ipAddress": "Main Panel IP Address",
+        "ipAddressPlaceholder": "Enter Main Panel IP Address (vd: 192.168.1.1)"
+    },
     "404": {
         "message": "Sorry, the page you visited does not exist.",
         "back": "Back to Home"
@@ -81,7 +97,12 @@
         "deleteWarning": "Are you sure you want to delete?",
         "deleteSuccess": "Deleted successfully!",
         "deleteError": "An error occurred while deleting.",
-        "noAccess": "You do not have access to this function."
+        "noAccess": "You do not have access to this function.",
+        "total": "Total",
+        "record": "record",
+        "config": "Config",
+        "detail": "Detail",
+        "invalidIPAddress": "Invalid IP Address"
     },
     "validation": {
         "min6Chars": "Must be at least 6 characters!",

@@ -82,14 +82,9 @@ function AccountManagement({ t }) {
             { name: t("AccountManagement.timer"), status: "disabled" },
             { name: t("AccountManagement.volume"), status: "disabled" },
             { name: t("AccountManagement.account"), status: "disabled" },
-            { name: t("AccountManagement.ip"), status: "disabled" },
             { name: t("AccountManagement.cabinet"), status: "disabled" },
             {
-                name: t("AccountManagement.simulation"),
-                status: "disabled",
-            },
-            {
-                name: t("AccountManagement.reports"),
+                name: t("AccountManagement.incident"),
                 status: "disabled",
             },
         ];
@@ -108,10 +103,9 @@ function AccountManagement({ t }) {
             permissions[4].status = "enabled";
             permissions[6].status = "enabled";
             permissions[7].status = "enabled";
-            permissions[8].status = "enabled";
         } else if (role === 3) {
             // Kỹ thuật viên bảo trì
-            permissions[9].status = "enabled";
+            permissions[7].status = "enabled";
         }
 
         return permissions;

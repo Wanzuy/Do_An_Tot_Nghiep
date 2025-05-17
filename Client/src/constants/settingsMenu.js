@@ -17,24 +17,20 @@ const settingsMenuKeys = [
         url: "/cai-dat/hen-gio",
     },
     {
+        titleKey: "settings.volume",
+        url: "/cai-dat/doi-ip",
+    },
+    {
         titleKey: "settings.account",
         url: "/cai-dat/quan-ly-tai-khoan",
     },
     {
-        titleKey: "settings.ip",
-        url: "/cai-dat/doi-ip",
-    },
-    {
         titleKey: "settings.cabinet",
-        url: "/cai-dat/tu-trung-tam",
+        url: "/cai-dat/tu-trung-tam-tu-dia-chi",
     },
     {
-        titleKey: "settings.simulation",
-        url: "/cai-dat/mo-phong-su-co",
-    },
-    {
-        titleKey: "settings.reports",
-        url: "/cai-dat/bao-cao-phan-tich",
+        titleKey: "settings.problem",
+        url: "/cai-dat/quan-ly-su-co",
     },
 ];
 
@@ -46,10 +42,8 @@ const menuIconKeys = {
     "settings.timer": "⏱️",
     "settings.volume": "🔊",
     "settings.account": "👤",
-    "settings.ip": "🌐",
     "settings.cabinet": "🔌",
-    "settings.simulation": "⚠️",
-    "settings.reports": "📊",
+    "settings.problem": "⚠️",
 };
 
 export const getSettingsMenu = (t) => {

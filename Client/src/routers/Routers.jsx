@@ -17,6 +17,7 @@ import "../styles/mainRouter.scss";
 import AccountManagement from "../pages/Settings/AccountManagement";
 import { errorToast } from "../utils/toastConfig";
 import ZonesManagement from "../pages/Settings/ZonesManagement";
+import CabinetManagement from "../pages/Settings/CabinetManagement";
 
 const ProtectedRoute = ({ element, requiredRole }) => {
     const auth = useSelector(authSelector);
@@ -103,6 +104,17 @@ const Routers = () => {
                                     element={
                                         <ProtectedRoute
                                             element={<ZonesManagement t={t} />}
+                                            requiredRole={[1, 2]}
+                                        />
+                                    }
+                                />
+                                <Route
+                                    path="/cai-dat/tu-trung-tam-tu-dia-chi"
+                                    element={
+                                        <ProtectedRoute
+                                            element={
+                                                <CabinetManagement t={t} />
+                                            }
                                             requiredRole={[1, 2]}
                                         />
                                     }

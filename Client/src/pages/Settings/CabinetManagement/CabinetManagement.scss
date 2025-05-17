@@ -1,0 +1,79 @@
+.cabinet-table-card {
+    .ant-card-body {
+        padding: 0;
+    }
+
+    .ant-table {
+        background-color: transparent;
+    }
+
+    .ant-table-thead > tr > th {
+        background-color: rgba(0, 0, 0, 0.2);
+        color: white;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .ant-table-tbody > tr > td {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        color: #e0e0e0;
+    }
+
+    .ant-table-tbody > tr:hover > td {
+        background-color: rgba(255, 255, 255, 0.05) !important;
+    }
+
+    .ant-table-pagination {
+        margin: 16px !important;
+
+        .ant-pagination-item-link {
+            color: #e0e0e0 !important;
+            background-color: rgba(0, 0, 0, 0.2);
+        }
+
+        .ant-pagination-item a {
+            color: #e0e0e0;
+        }
+
+        .ant-pagination-item-active {
+            background-color: #c62828;
+            border-color: #c62828;
+
+            a {
+                color: white;
+            }
+        }
+    }
+
+    .ant-empty-description {
+        color: white;
+    }
+
+    .ant-table-cell {
+        font-size: 1.4rem;
+    }
+
+    // Responsive styling
+    @media (max-width: 768px) {
+        .ant-table-content {
+            overflow-x: auto;
+        }
+    }
+}
+
+.custom-cabinet-table {
+    // Pagination text color
+    .ant-pagination-total-text {
+        color: white;
+    }
+
+    // Pagination item selector
+    .ant-select-selector {
+        background-color: rgba(0, 0, 0, 0.2) !important;
+        color: white !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    }
+
+    .ant-select-arrow {
+        color: white !important;
+    }
+}

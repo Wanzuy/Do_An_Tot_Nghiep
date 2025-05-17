@@ -12,4 +12,9 @@ export const apiEndpoint = {
         updateZone: (zoneId) => `/zones/${zoneId}`,
         deleteZone: (zoneId) => `/zones/${zoneId}`,
     },
+    panels: {
+        getAllPanels: "/panels",
+        getPanelsById: (panelId) => `/panels/${panelId}`,
+        updatePanel: (panelId) => `/panels/${panelId}`,
+    },
 };
