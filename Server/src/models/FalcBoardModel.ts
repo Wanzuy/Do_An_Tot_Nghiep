@@ -26,7 +26,7 @@ const falcBoardSchema = new Schema(
         },
         status: {
             // Trạng thái hiện tại của bo mạch (Normal (Bo mạch đang hoạt động bình thường, không có lỗi),
-            // Fault(Bo mạch đang gặp sự cố hoặc lỗi, nhưng vẫn có kết nối), Offline (bo mạch không kết nối được với hệ thống, có thể do mất điện, đứt kết nối, hoặc bị tắt)) - Giả lập
+            // Fault(Bo mạch đang gặp sự cố hoặc lỗi), Offline (bo mạch không kết nối được với hệ thống, có thể do mất điện, đứt kết nối, hoặc bị tắt)) - Giả lập
             type: String,
             enum: ["Normal", "Fault", "Offline"],
             default: "Normal",

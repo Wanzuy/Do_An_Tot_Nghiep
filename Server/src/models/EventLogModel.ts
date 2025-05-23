@@ -9,13 +9,14 @@ const eventLogSchema = new Schema(
             default: Date.now,
         },
         event_type: {
-            // Loại sự kiện (ví dụ: 'Alarm' (báo động), 'Fault' (lỗi), 'Restore' (khôi phục), 'Activation' (kích hoạt), 'Deactivation' (vô hiệu hóa), 'StatusChange' (thay đổi trạng thái), 'ConfigChange' (thay đổi cấu hình))
+            // Loại sự kiện (ví dụ: 'Fire Alarm' (báo động), 'Fault' (lỗi), 'Restore' (khôi phục), 'Activation' (kích hoạt), 'Deactivation' (vô hiệu hóa), 'StatusChange' (thay đổi trạng thái), 'ConfigChange' (thay đổi cấu hình))
             type: String,
             required: true,
             enum: [
                 "Fire Alarm",
                 "Fault",
                 "Restore",
+                "Offline",
                 "Activation",
                 "Deactivation",
                 "StatusChange",
@@ -35,18 +36,13 @@ const eventLogSchema = new Schema(
             enum: ["Detector", "NAC", "Panel"],
         },
         source_id: {
-            // ID của nguồn cụ thể (liên kết tới document Detector, NacCircuit, Panel, User tương ứng)
-            // Lưu ý: Vì source_type có thể khác nhau, chúng ta không dùng ref cố định ở đây.
-            // Bạn sẽ dùng source_type để biết nên populate từ collection nào nếu cần.
             type: Schema.Types.ObjectId,
-            // ref: (doc) => doc.source_type, // Mongoose có thể hỗ trợ ref động, nhưng query/populate phức tạp hơn.
-            // Để đơn giản cho đồ án, chỉ lưu ID và dùng source_type khi cần populate thủ công hoặc xử lý ở code.
             required: false, // Có thể không có ID nếu source_type là 'System' chung chung
         },
         zoneId: {
             // Liên kết đến Zone liên quan đến sự kiện (ví dụ: zone của detector báo động)
             type: Schema.Types.ObjectId,
-            ref: "zones", // Tham chiếu đến collection 'zones'
+            ref: "zones",
             required: false, // Không phải mọi sự kiện đều liên quan đến một zone cụ thể
         },
         panelId: {
@@ -64,7 +60,7 @@ const eventLogSchema = new Schema(
         acknowledged_by_user_id: {
             // ID của người dùng đã xác nhận sự kiện (nếu có)
             type: Schema.Types.ObjectId,
-            ref: "users", // Tham chiếu đến collection 'users' (cần tạo model User sau)
+            ref: "users",
             default: null,
         },
         acknowledged_at: {
@@ -73,14 +69,10 @@ const eventLogSchema = new Schema(
             default: null,
         },
         details: {
-            // Trường tùy chọn để lưu thông tin thêm dạng JSON về sự kiện
             type: mongoose.Schema.Types.Mixed, // Cho phép lưu các kiểu dữ liệu khác nhau (object, array, etc.)
         },
     },
     {
-        // Mongoose timestamps sẽ tự động thêm createdAt và updatedAt.
-        // Timestamp ở đây khác timestamp trường trên, dùng để biết document log được tạo/cập nhật khi nào trong DB.
-        // Trường timestamp trên là thời điểm sự kiện THỰC TẾ xảy ra.
         timestamps: true,
     }
 );

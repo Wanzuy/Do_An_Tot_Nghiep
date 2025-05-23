@@ -93,6 +93,7 @@ export const getAllZones = async (req: any, res: any) => {
         });
     }
 };
+
 /**
  * Lấy thông tin chi tiết của một zone theo ID
  */

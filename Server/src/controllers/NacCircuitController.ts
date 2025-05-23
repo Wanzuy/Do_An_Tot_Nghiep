@@ -47,19 +47,29 @@ export const createNacCircuit = async (req: any, res: any) => {
             });
         }
 
-        // Tạo NacCircuit mới bằng cách truyền trực tiếp req.body
-        // Đảm bảo req.body chứa output_type và zoneId
+        const requestedCircuitNumber = req.body.circuit_number;
+        const maxCircuits = nacBoard.circuit_count;
+
+        if (
+            requestedCircuitNumber < 1 ||
+            requestedCircuitNumber > maxCircuits
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: `Bo mạch NAC "${nacBoard.name}". Chỉ cho phép gắn ${maxCircuits} mạch circuit.`,
+            });
+        }
+
         const newNacCircuit = new NacCircuitModel(req.body);
 
         const savedCircuit = await newNacCircuit.save();
 
-        // Populate các trường liên kết trước khi trả về
         const result = await NacCircuitModel.findById(savedCircuit._id)
             .populate({
                 path: "nacBoardId",
                 populate: { path: "panelId", select: "name panel_type" },
-            }) // Populate NacBoard và populate tiếp Panel
-            .populate("zoneId", "name description"); // Populate Zone
+            })
+            .populate("zoneId", "name description");
 
         res.status(201).json({
             success: true,

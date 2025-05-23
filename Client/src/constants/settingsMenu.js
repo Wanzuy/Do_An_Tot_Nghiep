@@ -2,11 +2,11 @@
 const settingsMenuKeys = [
     {
         titleKey: "settings.falc",
-        url: "/cai-dat/falc",
+        url: "/cai-dat/khoi-giam-sat-dau-bao-falc",
     },
     {
         titleKey: "settings.nac",
-        url: "/cai-dat/nac",
+        url: "/cai-dat/khoi-dieu-khien-chuong-den-nac",
     },
     {
         titleKey: "settings.zone",

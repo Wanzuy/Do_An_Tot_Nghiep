@@ -298,44 +298,45 @@ export const deleteNacBoard = async (req: any, res: any) => {
 };
 
 /**
- * Get all NAC boards by panel ID
+ * Lấy tất cả bo mạch NAC và circuit của nó
+ *
  */
-export const getNacBoardsByPanelId = async (req: any, res: any) => {
+
+export const getNacBoardsWithCircuits = async (req: any, res: any) => {
     try {
-        const { panelId } = req.params; // Giữ tên param là panelId
-
-        // Kiểm tra panelId hợp lệ
-        if (!mongoose.Types.ObjectId.isValid(panelId)) {
-            return res
-                .status(400)
-                .json({ success: false, message: "ID Panel không hợp lệ." });
-        }
-        // Tùy chọn: Kiểm tra panelId có tồn tại trong collection Panel không (đảm bảo lấy boards cho panel có thật)
-        // const panel = await PanelModel.findById(panelId);
-        // if (!panel) {
-        //      return res.status(404).json({ success: false, message: "Không tìm thấy Panel với ID " + panelId });
-        // }
-
-        const nacBoards = await NacBoardModel.find({ panelId }) // Lọc theo panelId
-            .populate("panelId", "name panel_type") // Populate panelId
+        // Lấy tất cả NacBoards
+        const nacBoards = await NacBoardModel.find()
+            .populate("panelId", "name panel_type")
             .sort({ createdAt: -1 });
+
+        // Tạo một mảng đối tượng kết quả với trường circuits cho mỗi board
+        const result = await Promise.all(
+            nacBoards.map(async (board) => {
+                // Lấy các mạch liên quan đến board này
+                const circuits = await NacCircuitModel.find({
+                    nacBoardId: board._id,
+                }).select("name status circuit_number is_active");
+
+                // Trả về đối tượng board với thông tin mạch
+                return {
+                    ...board.toObject(),
+                    circuits,
+                };
+            })
+        );
 
         res.status(200).json({
             success: true,
-            count: nacBoards.length,
-            data: nacBoards,
+            count: result.length,
+            data: result,
         });
     } catch (error: any) {
-        console.error(
-            "Lỗi khi lấy danh sách bo mạch NAC theo Panel ID:",
-            error
-        );
-        // Lỗi CastError đã được bắt ở kiểm tra isValid
+        console.error("Lỗi khi lấy danh sách bo mạch NAC và circuit:", error);
         res.status(500).json({
             success: false,
             message:
                 error.message ||
-                "Đã xảy ra lỗi khi lấy danh sách bo mạch NAC theo Panel ID.",
+                "Đã xảy ra lỗi khi lấy danh sách bo mạch NAC và circuit.",
         });
     }
 };

@@ -100,11 +100,14 @@ export const createDetector = async (req: any, res: any) => {
 
         // Populate các trường liên kết trước khi trả về
         const result = await DetectorModel.findById(savedDetector._id)
-            .populate(
-                "falcBoardId",
-                "name panelId loop_count number_of_detectors"
-            ) // Populate thêm thông tin FalcBoard
-            .populate("zoneId", "name description");
+            .populate({
+                path: "falcBoardId",
+                populate: {
+                    path: "panelId",
+                    select: "status",
+                },
+            })
+            .populate("zoneId", "name description"); // Populate Zone như cũ
 
         res.status(201).json({
             success: true,
@@ -411,8 +414,15 @@ export const updateDetectorStatus = async (req: any, res: any) => {
         // Lấy thông tin đầu báo hiện tại để so sánh trạng thái cũ và lấy thông tin cho log
         // Populate thêm zoneId để có tên zone cho log
         const detector: any = await DetectorModel.findById(req.params.id)
-            .populate("falcBoardId", "panelId loop_number") // Populate FalcBoard và thêm loop_number
-            .populate("zoneId", "name"); // Populate Zone
+            .populate({
+                path: "falcBoardId",
+                populate: {
+                    path: "panelId",
+                    select: "status",
+                },
+                select: "panelId loop_number is_active",
+            })
+            .populate("zoneId", "name");
 
         if (!detector) {
             return res.status(404).json({
@@ -440,7 +450,15 @@ export const updateDetectorStatus = async (req: any, res: any) => {
         const updatedDetector = await detector.save(); // Lưu thay đổi
 
         // --- GHI LOG SỰ KIỆN ---
-        if (oldStatus !== updatedDetector.status) {
+        if (
+            oldStatus !== updatedDetector.status &&
+            (updatedDetector.status === "Alarm" ||
+                updatedDetector.status === "Fault") &&
+            updatedDetector.falcBoardId &&
+            updatedDetector.falcBoardId.is_active &&
+            updatedDetector.falcBoardId.panelId &&
+            updatedDetector.falcBoardId.panelId.status === "Online"
+        ) {
             const eventType: any =
                 updatedDetector.status === "Alarm"
                     ? "Fire Alarm"
@@ -545,9 +563,13 @@ export const updateDetectorStatus = async (req: any, res: any) => {
         const finalDetector = await DetectorModel.findById(updatedDetector._id)
             .populate({
                 path: "falcBoardId",
-                populate: { path: "panelId", select: "name panel_type" },
+                populate: {
+                    path: "panelId",
+                    select: "status",
+                },
+                select: "panelId loop_number is_active",
             })
-            .populate("zoneId", "name description");
+            .populate("zoneId", "name");
 
         res.status(200).json({
             success: true,

@@ -4,14 +4,15 @@ import EventLogModel from "../models/EventLogModel";
 // --- Hàm nội bộ: Tạo một bản ghi Log sự kiện ---
 // Hàm này sẽ được các controller khác (Detector, NAC, User, System...) gọi.
 type EventType =
-    | "Alarm"
+    | "Fire Alarm"
     | "Fault"
+    | "Offline"
     | "Restore"
     | "Activation"
     | "Deactivation"
     | "StatusChange";
 
-type SourceType = "Detector" | "NAC"; // Chỉ log từ Detector hoặc NAC theo yêu cầu
+type SourceType = "Detector" | "NAC" | "FalcBoard"; // Chỉ log từ Detector hoặc NAC theo yêu cầu
 // Bỏ các loại nguồn khác như Panel, User, System trong phạm vi ghi log
 
 type LogStatus = "Active" | "Cleared" | "Info"; // Giữ nguyên

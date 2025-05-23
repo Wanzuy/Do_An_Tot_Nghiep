@@ -41,6 +41,11 @@ const detectorSchema = new Schema(
             enum: ["Normal", "Alarm", "Fault", "Disabled"],
             default: "Normal",
         },
+        is_active: {
+            // Trạng thái hoạt động (được cấu hình sử dụng hay không)
+            type: Boolean,
+            default: true,
+        },
         last_reading: {
             // Giá trị đọc được gần nhất (nếu có, ví dụ mức khói, nhiệt độ) - Giả lập
             type: mongoose.Schema.Types.Mixed, // Kiểu dữ liệu linh hoạt
@@ -49,11 +54,6 @@ const detectorSchema = new Schema(
             // Thời gian trạng thái/giá trị được báo cáo lần cuối - Giả lập
             type: Date,
             default: Date.now,
-        },
-        is_active: {
-            // Trạng thái hoạt động (được cấu hình sử dụng hay không)
-            type: Boolean,
-            default: true,
         },
     },
     {

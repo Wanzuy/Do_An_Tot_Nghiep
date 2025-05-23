@@ -18,6 +18,8 @@ import AccountManagement from "../pages/Settings/AccountManagement";
 import { errorToast } from "../utils/toastConfig";
 import ZonesManagement from "../pages/Settings/ZonesManagement";
 import CabinetManagement from "../pages/Settings/CabinetManagement";
+import Falcmanagement from "../pages/Settings/Falcmanagement";
+import NacManagement from "../pages/Settings/NacManagement";
 
 const ProtectedRoute = ({ element, requiredRole }) => {
     const auth = useSelector(authSelector);
@@ -87,6 +89,24 @@ const Routers = () => {
                                 <Route
                                     path="/cai-dat"
                                     element={<Settings t={t} />}
+                                />
+                                <Route
+                                    path="/cai-dat/khoi-giam-sat-dau-bao-falc"
+                                    element={
+                                        <ProtectedRoute
+                                            element={<Falcmanagement t={t} />}
+                                            requiredRole={[1, 2]}
+                                        />
+                                    }
+                                />
+                                <Route
+                                    path="/cai-dat/khoi-dieu-khien-chuong-den-nac"
+                                    element={
+                                        <ProtectedRoute
+                                            element={<NacManagement t={t} />}
+                                            requiredRole={[1, 2]}
+                                        />
+                                    }
                                 />
                                 <Route
                                     path="/cai-dat/quan-ly-tai-khoan"

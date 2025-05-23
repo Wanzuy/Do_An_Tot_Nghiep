@@ -19,6 +19,12 @@
         "version": "Phiên bản:",
         "reserve": "© 2025 Tinventor Electronics - Tất cả các quyền được bảo lưu."
     },
+    "FalcManagement": {
+        "title": "Quản lý module FALC",
+        "board": "Bo mạch",
+        "note": "Ghi chú",
+        "numberdetectors": "Số đầu báo trong một vòng"
+    },
     "AccountManagement": {
         "title": "Quản lý tài khoản",
         "accountname": "Tên tài khoản",
@@ -83,6 +89,11 @@
         "message": "Xin lỗi, trang bạn đã truy cập không tồn tại.",
         "back": "Quay lại trang chủ"
     },
+    "validation": {
+        "min6Chars": "Phải có ít nhất 6 ký tự !",
+        "required": "Vui lòng nhập trường này !",
+        "passwordComplexity": "Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt"
+    },
     "common": {
         "cancel": "Hủy",
         "save": "Lưu",
@@ -102,11 +113,7 @@
         "record": "bản ghi",
         "config": "Cấu hình",
         "detail": "Chi tiết",
-        "invalidIPAddress": "Địa chỉ IP không hợp lệ"
-    },
-    "validation": {
-        "min6Chars": "Phải có ít nhất 6 ký tự !",
-        "required": "Vui lòng nhập trường này !",
-        "passwordComplexity": "Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt"
+        "invalidIPAddress": "Địa chỉ IP không hợp lệ",
+        "loading": "Đang tải dữ liệu..."
     }
 }

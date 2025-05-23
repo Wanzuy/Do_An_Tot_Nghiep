@@ -19,6 +19,12 @@
         "version": "Version:",
         "reserve": "© 2025 Tinventor Electronics - All rights reserved."
     },
+    "FalcManagement": {
+        "title": "FALC Module Management",
+        "board": "Board",
+        "note": "Note",
+        "numberdetectors": "Number of Detectors in a Loop"
+    },
     "AccountManagement": {
         "title": "Account Management",
         "accountname": "Account Name",
@@ -83,6 +89,11 @@
         "message": "Sorry, the page you visited does not exist.",
         "back": "Back to Home"
     },
+    "validation": {
+        "min6Chars": "Must be at least 6 characters!",
+        "required": "Please fill out this field!",
+        "passwordComplexity": "Password must be at least 8 characters long and include uppercase letters, lowercase letters, numbers, and special characters"
+    },
     "common": {
         "cancel": "Cancel",
         "save": "Save",
@@ -102,11 +113,7 @@
         "record": "record",
         "config": "Config",
         "detail": "Detail",
-        "invalidIPAddress": "Invalid IP Address"
-    },
-    "validation": {
-        "min6Chars": "Must be at least 6 characters!",
-        "required": "Please fill out this field!",
-        "passwordComplexity": "Password must be at least 8 characters long and include uppercase letters, lowercase letters, numbers, and special characters"
+        "invalidIPAddress": "Invalid IP Address",
+        "loading": "Loading data..."
     }
 }

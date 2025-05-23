@@ -4,14 +4,14 @@ import {
     deleteNacBoard,
     getAllNacBoards,
     getNacBoardById,
-    getNacBoardsByPanelId,
+    getNacBoardsWithCircuits,
     updateNacBoard,
 } from "../controllers/NacBoardController";
 
 const router = Router();
 router.get("/", getAllNacBoards);
+router.get("/with-circuits", getNacBoardsWithCircuits);
 router.get("/:id", getNacBoardById);
-router.get("/panel/:panelId", getNacBoardsByPanelId);
 router.post("/", createNacBoard);
 router.put("/:id", updateNacBoard);
 router.delete("/:id", deleteNacBoard);

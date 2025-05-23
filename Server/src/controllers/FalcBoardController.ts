@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import FalcBoardModel from "../models/FalcBoardModel";
 import PanelModel from "../models/PanelModel";
 import DetectorModel from "../models/DetectorModel";
+import { createEventLog } from "./EventLogController";
 
 /**
  * Create a new FALC board
@@ -239,6 +240,89 @@ export const updateFalcBoard = async (req: any, res: any) => {
                 message:
                     error.message ||
                     "Lỗi khi cập nhật bo mạch FALC với ID " + req.params.id,
+            });
+        }
+    }
+};
+
+/**
+ * Update FALC board status by ID
+ */
+export const updateFalcBoardStatus = async (req: any, res: any) => {
+    try {
+        // Kiểm tra ID hợp lệ
+        if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+            return res.status(404).json({
+                success: false,
+                message: "Không tìm thấy bo mạch FALC với ID " + req.params.id,
+            });
+        }
+
+        const { is_active } = req.body; // CHỈ NHẬN is_active từ body
+
+        // Kiểm tra nếu is_active không được gửi đi hoặc không phải boolean
+        if (is_active === undefined || typeof is_active !== "boolean") {
+            return res.status(400).json({
+                success: false,
+                message: "'is_active' (boolean) là bắt buộc trong body.",
+            });
+        }
+
+        // Lấy thông tin bo mạch hiện tại để so sánh trạng thái cũ và lấy thông tin cho log
+        // Populate Panel để ghi log
+        const falcBoard: any = await FalcBoardModel.findById(
+            req.params.id
+        ).populate("panelId", "name panel_type");
+
+        if (!falcBoard) {
+            return res.status(404).json({
+                success: false,
+                message: "Không tìm thấy bo mạch FALC với ID " + req.params.id,
+            });
+        }
+
+        // CHỈ CẬP NHẬT is_active VÀ TỰ ĐỘNG SET status
+        falcBoard.is_active = is_active;
+
+        // Tự động set status dựa trên is_active mới
+        if (falcBoard.is_active === true) {
+            // Nếu bật, status về Normal
+            falcBoard.status = "Normal";
+        } else {
+            // is_active === false
+            // Nếu tắt, status về Offline (giả định người dùng tắt để bảo trì)
+            // Lưu ý: Status Fault/Offline do lỗi hệ thống cần logic khác cập nhật
+            if (falcBoard.status !== "Fault") {
+                // KHÔNG thay đổi status nếu nó đang là Fault (lỗi hệ thống)
+                falcBoard.status = "Offline";
+            }
+        }
+
+        const updatedFalcBoard = await falcBoard.save(); // Lưu thay đổi
+
+        res.status(200).json({
+            success: true,
+            message: "Cập nhật trạng thái bo mạch FALC thành công.",
+            data: updatedFalcBoard,
+        });
+    } catch (error: any) {
+        console.error("Lỗi khi cập nhật trạng thái bo mạch FALC:", error);
+        if (error.name === "ValidationError") {
+            res.status(400).json({
+                success: false,
+                message: "Lỗi xác thực dữ liệu: " + error.message,
+            });
+        } else if (error.kind === "ObjectId") {
+            return res.status(404).json({
+                success: false,
+                message: "ID Bo mạch FALC không hợp lệ.",
+            });
+        } else {
+            res.status(500).json({
+                success: false,
+                message:
+                    error.message ||
+                    "Đã xảy ra lỗi khi cập nhật trạng thái bo mạch FALC.",
             });
         }
     }

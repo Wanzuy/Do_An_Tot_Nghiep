@@ -40,6 +40,27 @@ function Settings({ t }) {
                 errorToast(t("common.noAccess"));
             }
         } else if (url === "/cai-dat/tu-trung-tam-tu-dia-chi") {
+            // Role 1 hoặc 2 có quyền truy cập quản lý tủ trung tâm
+            if (
+                userInfo &&
+                (Number(userInfo.role) === 1 || Number(userInfo.role) === 2)
+            ) {
+                navigate(url);
+            } else {
+                errorToast(t("common.noAccess"));
+            }
+        } else if (url === "/cai-dat/khoi-giam-sat-dau-bao-falc") {
+            // Role 1 hoặc 2 có quyền truy cập quản lý FALC
+            if (
+                userInfo &&
+                (Number(userInfo.role) === 1 || Number(userInfo.role) === 2)
+            ) {
+                navigate(url);
+            } else {
+                errorToast(t("common.noAccess"));
+            }
+        } else if (url === "/cai-dat/khoi-dieu-khien-chuong-den-nac") {
+            // Role 1 hoặc 2 có quyền truy cập quản lý NAC
             if (
                 userInfo &&
                 (Number(userInfo.role) === 1 || Number(userInfo.role) === 2)
@@ -49,7 +70,6 @@ function Settings({ t }) {
                 errorToast(t("common.noAccess"));
             }
         } else {
-            // Các trang khác không cần kiểm tra quyền
             navigate(url);
         }
     };

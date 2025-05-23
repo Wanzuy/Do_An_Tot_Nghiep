@@ -17,4 +17,8 @@ export const apiEndpoint = {
         getPanelsById: (panelId) => `/panels/${panelId}`,
         updatePanel: (panelId) => `/panels/${panelId}`,
     },
+    falc: {
+        getAll: "/falcboards",
+        updateStatus: (falcId) => `/falcboards/${falcId}/status`,
+    },
 };

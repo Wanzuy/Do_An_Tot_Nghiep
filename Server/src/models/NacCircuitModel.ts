@@ -3,13 +3,17 @@ import mongoose, { Schema } from "mongoose";
 const nacCircuitSchema = new Schema(
     {
         nacBoardId: {
-            // Liên kết đến bo mạch NAC chứa mạch này
             type: Schema.Types.ObjectId,
-            ref: "nacboards", // Tham chiếu đến collection 'nacboards'
+            ref: "nacboards",
+            required: true,
+        },
+        zoneId: {
+            // Liên kết đến Phân vùng (Zone) mà mạch này phục vụ
+            type: Schema.Types.ObjectId,
+            ref: "zones",
             required: true,
         },
         name: {
-            // Tên mạch, ví dụ: NAC Circuit 1
             type: String,
             trim: true,
         },
@@ -34,12 +38,6 @@ const nacCircuitSchema = new Schema(
             type: String,
             enum: ["Audible", "Visual", "Relay", "Other"],
             default: "Audible",
-        },
-        zoneId: {
-            // Liên kết đến Phân vùng (Zone) mà mạch này phục vụ
-            type: Schema.Types.ObjectId,
-            ref: "zones", // Đã sửa ref thành "zones"
-            required: true,
         },
     },
     {
