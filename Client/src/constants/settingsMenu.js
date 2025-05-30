@@ -14,11 +14,11 @@ const settingsMenuKeys = [
     },
     {
         titleKey: "settings.timer",
-        url: "/cai-dat/hen-gio",
+        url: "/cai-dat/quan-ly-hen-gio",
     },
     {
         titleKey: "settings.volume",
-        url: "/cai-dat/doi-ip",
+        url: "/cai-dat/quan-ly-am-luong",
     },
     {
         titleKey: "settings.account",

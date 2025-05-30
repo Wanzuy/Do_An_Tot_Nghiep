@@ -60,15 +60,22 @@ function Settings({ t }) {
                 errorToast(t("common.noAccess"));
             }
         } else if (url === "/cai-dat/khoi-dieu-khien-chuong-den-nac") {
-            // Role 1 hoặc 2 có quyền truy cập quản lý NAC
-            if (
-                userInfo &&
-                (Number(userInfo.role) === 1 || Number(userInfo.role) === 2)
-            ) {
-                navigate(url);
-            } else {
-                errorToast(t("common.noAccess"));
-            }
+            // // Role 1 hoặc 2 có quyền truy cập quản lý NAC
+            // if (
+            //     userInfo &&
+            //     (Number(userInfo.role) === 1 || Number(userInfo.role) === 2)
+            // ) {
+            //     navigate(url);
+            // } else {
+            //     errorToast(t("common.noAccess"));
+            // }
+            errorToast("có lỗi xảy ra! Vui lòng thử lại sau");
+        } else if (url === "/cai-dat/quan-ly-am-luong") {
+            errorToast("có lỗi xảy ra! Vui lòng thử lại sau");
+        } else if (url === "/cai-dat/quan-ly-hen-gio") {
+            errorToast("có lỗi xảy ra! Vui lòng thử lại sau");
+        } else if (url === "/cai-dat/quan-ly-su-co") {
+            errorToast("có lỗi xảy ra! Vui lòng thử lại sau");
         } else {
             navigate(url);
         }
