@@ -3,7 +3,7 @@ import queryString from "query-string";
 import { localDataNames } from "../constants/appInfo";
 
 // const baseURL = "http://localhost:3003";
-const baseURLProduction = "https://fire-alarmm.onrender.com";
+const baseURLProduction = "https://fire-alarm.onrender.com";
 
 const getAccessToken = () => {
     const res = localStorage.getItem(localDataNames.authData);
