@@ -2,8 +2,8 @@ import axios from "axios";
 import queryString from "query-string";
 import { localDataNames } from "../constants/appInfo";
 
-const baseURL = "http://localhost:3003";
-// const baseURLProduction = ""
+// const baseURL = "http://localhost:3003";
+const baseURLProduction = "https://fire-alarmm.onrender.com";
 
 const getAccessToken = () => {
     const res = localStorage.getItem(localDataNames.authData);
@@ -11,7 +11,7 @@ const getAccessToken = () => {
 };
 
 const axiosClient = axios.create({
-    baseURL: baseURL,
+    baseURL: baseURLProduction,
     paramsSerializer: (params) => queryString.stringify(params),
 });
 
