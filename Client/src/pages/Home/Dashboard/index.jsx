@@ -48,7 +48,7 @@ function Dashboard() {
                             {/* Block 1: System Overview */}
                             <div className="bg-[#444444] rounded p-3 border border-solid border-[#FFFFFF0D]">
                                 <div className="flex items-center justify-between mb-2">
-                                    <div className="text-white font-medium text-2xl">
+                                    <div className="text-white font-medium text-3xl">
                                         Tổng quan hệ thống
                                     </div>
                                     <SettingOutlined
@@ -87,27 +87,27 @@ function Dashboard() {
                             {/* Block 2: Notifications */}
                             <div className="bg-[#444444] rounded p-3 border border-solid border-[#FFFFFF0D]">
                                 <div className="flex items-center justify-between mb-2">
-                                    <div className="text-white font-medium text-2xl">
+                                    <div className="text-white font-medium text-3xl">
                                         Thông báo mới
                                     </div>
-                                    <div className="bg-[#e53935] text-white text-xs rounded-full px-2 py-0.5">
+                                    <div className="bg-[#e53935] text-white text-xl rounded-full px-2 py-0.5">
                                         5
                                     </div>
                                 </div>
                                 <div className="mt-3 space-y-2">
                                     <div className="border-b border-[#FFFFFF0D] pb-2">
-                                        <div className="text-white text-sm">
+                                        <div className="text-white text-xl">
                                             Cảnh báo nhiệt độ cao
                                         </div>
-                                        <div className="text-gray-400 text-xs">
+                                        <div className="text-gray-400 text-lg">
                                             10 phút trước
                                         </div>
                                     </div>
                                     <div className="border-b border-[#FFFFFF0D] pb-2">
-                                        <div className="text-white text-sm">
+                                        <div className="text-white text-xl">
                                             Mất kết nối FAC01_008
                                         </div>
-                                        <div className="text-gray-400 text-xs">
+                                        <div className="text-gray-400 text-lg">
                                             25 phút trước
                                         </div>
                                     </div>
@@ -117,7 +117,7 @@ function Dashboard() {
                             {/* Block 3: Quick Actions */}
                             <div className="bg-[#444444] rounded p-3 border border-solid border-[#FFFFFF0D]">
                                 <div className="flex items-center justify-between mb-3">
-                                    <div className="text-white font-medium text-base">
+                                    <div className="text-white font-medium text-3xl">
                                         Thao tác nhanh
                                     </div>
                                 </div>
@@ -126,7 +126,7 @@ function Dashboard() {
                                         <PhoneOutlined
                                             style={{ fontSize: "18px" }}
                                         />
-                                        <span className="text-xs mt-1">
+                                        <span className="text-xl mt-1">
                                             Gọi hỗ trợ
                                         </span>
                                     </button>
@@ -134,19 +134,19 @@ function Dashboard() {
                                         <SettingOutlined
                                             style={{ fontSize: "18px" }}
                                         />
-                                        <span className="text-xs mt-1">
+                                        <span className="text-xl mt-1">
                                             Cấu hình
                                         </span>
                                     </button>
                                     <button className="bg-[#555555] hover:bg-[#666666] text-white p-2 rounded transition flex flex-col items-center">
                                         <span className="text-xl">⚠️</span>
-                                        <span className="text-xs mt-1">
+                                        <span className="text-xl mt-1">
                                             Báo cáo
                                         </span>
                                     </button>
                                     <button className="bg-[#555555] hover:bg-[#666666] text-white p-2 rounded transition flex flex-col items-center">
                                         <span className="text-xl">🔄</span>
-                                        <span className="text-xs mt-1">
+                                        <span className="text-xl mt-1">
                                             Làm mới
                                         </span>
                                     </button>
@@ -156,7 +156,7 @@ function Dashboard() {
                             {/* Block 4: Status Statistics */}
                             <div className="bg-[#444444] rounded p-3 border border-solid border-[#FFFFFF0D] flex-grow">
                                 <div className="flex items-center justify-between mb-3">
-                                    <div className="text-white font-medium text-2xl">
+                                    <div className="text-white font-medium text-3xl">
                                         Thống kê trạng thái
                                     </div>
                                 </div>
