@@ -7,13 +7,14 @@ import {
     toggleTime,
     updateTime,
 } from "../controllers/TimeController";
+import { verifyToken } from "../middlewares/verifyToken";
 
 const router = Router();
 
-router.get("/", getAllTimes);
-router.get("/:id", getTimeById);
-router.post("/", createTime);
-router.put("/:id", updateTime);
-router.patch("/:id", toggleTime);
-router.delete("/:id", deleteTime);
+router.get("/", verifyToken, getAllTimes);
+router.get("/:id", verifyToken, getTimeById);
+router.post("/", verifyToken, createTime);
+router.put("/:id", verifyToken, updateTime);
+router.patch("/:id", verifyToken, toggleTime);
+router.delete("/:id", verifyToken, deleteTime);
 export default router;

@@ -18,7 +18,13 @@ const mongoose_1 = __importDefault(require("mongoose"));
 // Tạo mới time
 const createTime = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        const user = req.user;
         const { panelId, name, time, repeat, audioFile, isEnabled, description, } = req.body;
+        if (user.role !== 1 && user.role !== 2) {
+            return res.status(403).json({
+                message: "Bạn không có quyền truy cập vào chức năng này !",
+            });
+        }
         // Validate panelId
         if (!mongoose_1.default.Types.ObjectId.isValid(panelId)) {
             return res.status(400).json({
@@ -61,6 +67,12 @@ exports.createTime = createTime;
 // Lấy tất cả times
 const getAllTimes = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        const user = req.user;
+        if (user.role !== 1 && user.role !== 2) {
+            return res.status(403).json({
+                message: "Bạn không có quyền truy cập vào chức năng này !",
+            });
+        }
         const times = yield TimeModel_1.default.find()
             .populate("panelId", "name")
             .sort({ time: 1 });
@@ -84,6 +96,12 @@ exports.getAllTimes = getAllTimes;
 const getTimeById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id } = req.params;
+        const user = req.user;
+        if (user.role !== 1 && user.role !== 2) {
+            return res.status(403).json({
+                message: "Bạn không có quyền truy cập vào chức năng này!",
+            });
+        }
         if (!mongoose_1.default.Types.ObjectId.isValid(id)) {
             return res.status(400).json({
                 success: false,
@@ -117,6 +135,12 @@ const updateTime = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     try {
         const { id } = req.params;
         const { name, time, repeat, audioFile, isEnabled, description } = req.body;
+        const user = req.user;
+        if (user.role !== 1 && user.role !== 2) {
+            return res.status(403).json({
+                message: "Bạn không có quyền truy cập vào chức năng này !",
+            });
+        }
         if (!mongoose_1.default.Types.ObjectId.isValid(id)) {
             return res.status(400).json({
                 success: false,
@@ -171,6 +195,12 @@ exports.updateTime = updateTime;
 const deleteTime = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id } = req.params;
+        const user = req.user;
+        if (user.role !== 1 && user.role !== 2) {
+            return res.status(403).json({
+                message: "Bạn không có quyền truy cập vào chức năng này !",
+            });
+        }
         if (!mongoose_1.default.Types.ObjectId.isValid(id)) {
             return res.status(400).json({
                 success: false,
@@ -203,6 +233,12 @@ exports.deleteTime = deleteTime;
 const toggleTime = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id } = req.params;
+        const user = req.user;
+        if (user.role !== 1 && user.role !== 2) {
+            return res.status(403).json({
+                message: "Bạn không có quyền truy cập vào chức năng này !",
+            });
+        }
         if (!mongoose_1.default.Types.ObjectId.isValid(id)) {
             return res.status(400).json({
                 success: false,

@@ -8,7 +8,7 @@ import NacCircuitModel from "../models/NacCircuitModel";
  */
 export const createZone = async (req: any, res: any) => {
     try {
-        const { name, parentId, description } = req.body;
+        const { name, parentId } = req.body;
         const user = req.user;
 
         if (user.role !== 1 && user.role !== 2) {

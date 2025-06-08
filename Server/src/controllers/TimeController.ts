@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 // Tạo mới time
 export const createTime = async (req: any, res: any) => {
     try {
+        const user = req.user;
         const {
             panelId,
             name,
@@ -13,6 +14,12 @@ export const createTime = async (req: any, res: any) => {
             isEnabled,
             description,
         } = req.body;
+
+        if (user.role !== 1 && user.role !== 2) {
+            return res.status(403).json({
+                message: "Bạn không có quyền truy cập vào chức năng này !",
+            });
+        }
 
         // Validate panelId
         if (!mongoose.Types.ObjectId.isValid(panelId)) {
@@ -58,6 +65,14 @@ export const createTime = async (req: any, res: any) => {
 // Lấy tất cả times
 export const getAllTimes = async (req: any, res: any) => {
     try {
+        const user = req.user;
+
+        if (user.role !== 1 && user.role !== 2) {
+            return res.status(403).json({
+                message: "Bạn không có quyền truy cập vào chức năng này !",
+            });
+        }
+
         const times = await TimeModel.find()
             .populate("panelId", "name")
             .sort({ time: 1 });
@@ -81,6 +96,13 @@ export const getAllTimes = async (req: any, res: any) => {
 export const getTimeById = async (req: any, res: any) => {
     try {
         const { id } = req.params;
+        const user = req.user;
+
+        if (user.role !== 1 && user.role !== 2) {
+            return res.status(403).json({
+                message: "Bạn không có quyền truy cập vào chức năng này!",
+            });
+        }
 
         if (!mongoose.Types.ObjectId.isValid(id)) {
             return res.status(400).json({
@@ -118,6 +140,13 @@ export const updateTime = async (req: any, res: any) => {
         const { id } = req.params;
         const { name, time, repeat, audioFile, isEnabled, description } =
             req.body;
+        const user = req.user;
+
+        if (user.role !== 1 && user.role !== 2) {
+            return res.status(403).json({
+                message: "Bạn không có quyền truy cập vào chức năng này !",
+            });
+        }
 
         if (!mongoose.Types.ObjectId.isValid(id)) {
             return res.status(400).json({
@@ -170,6 +199,13 @@ export const updateTime = async (req: any, res: any) => {
 export const deleteTime = async (req: any, res: any) => {
     try {
         const { id } = req.params;
+        const user = req.user;
+
+        if (user.role !== 1 && user.role !== 2) {
+            return res.status(403).json({
+                message: "Bạn không có quyền truy cập vào chức năng này !",
+            });
+        }
 
         if (!mongoose.Types.ObjectId.isValid(id)) {
             return res.status(400).json({
@@ -205,6 +241,13 @@ export const deleteTime = async (req: any, res: any) => {
 export const toggleTime = async (req: any, res: any) => {
     try {
         const { id } = req.params;
+        const user = req.user;
+
+        if (user.role !== 1 && user.role !== 2) {
+            return res.status(403).json({
+                message: "Bạn không có quyền truy cập vào chức năng này !",
+            });
+        }
 
         if (!mongoose.Types.ObjectId.isValid(id)) {
             return res.status(400).json({

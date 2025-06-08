@@ -22,7 +22,7 @@ const NacCircuitModel_1 = __importDefault(require("../models/NacCircuitModel"));
  */
 const createZone = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { name, parentId, description } = req.body;
+        const { name, parentId } = req.body;
         const user = req.user;
         if (user.role !== 1 && user.role !== 2) {
             return res.status(403).json({
