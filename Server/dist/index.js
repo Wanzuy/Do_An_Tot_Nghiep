@@ -14,6 +14,7 @@ const DetectorRouter_1 = __importDefault(require("./src/routers/DetectorRouter")
 const NacBoardRouter_1 = __importDefault(require("./src/routers/NacBoardRouter"));
 const NacCircuitRouter_1 = __importDefault(require("./src/routers/NacCircuitRouter"));
 const PanelRouter_1 = __importDefault(require("./src/routers/PanelRouter"));
+const TimeRouter_1 = __importDefault(require("./src/routers/TimeRouter"));
 const EventLogRouter_1 = __importDefault(require("./src/routers/EventLogRouter"));
 dotenv_1.default.config();
 const app = (0, express_1.default)();
@@ -27,6 +28,7 @@ app.use("/detectors", DetectorRouter_1.default);
 app.use("/nacboards", NacBoardRouter_1.default);
 app.use("/naccircuits", NacCircuitRouter_1.default);
 app.use("/panels", PanelRouter_1.default);
+app.use("/times", TimeRouter_1.default);
 app.use("/eventlogs", EventLogRouter_1.default);
 (0, connect_1.default)()
     .then(() => {

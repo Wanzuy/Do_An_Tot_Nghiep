@@ -34,56 +34,52 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importStar(require("mongoose"));
-const panelSchema = new mongoose_1.Schema({
+const timeSchema = new mongoose_1.Schema({
+    panelId: {
+        type: mongoose_1.Schema.Types.ObjectId,
+        ref: "panels",
+        required: true,
+    },
     name: {
         type: String,
         required: true,
-        unique: true,
-        trim: true,
     },
-    panel_type: {
-        type: String,
-        // Loại bảng điều khiển,  Control Panel(Tủ điều khiển chính), Sub Panel (Tủ điều khiển phụ hoặc Tủ điều khiển địa chỉ)
-        enum: ["Control Panel", "Sub Panel"],
+    time: {
+        type: Date,
         required: true,
     },
-    location: {
+    repeat: {
+        type: [String],
+        enum: [
+            "monday",
+            "tuesday",
+            "wednesday",
+            "thursday",
+            "friday",
+            "saturday",
+            "sunday",
+        ],
+        default: [],
+    },
+    audioFile: {
+        type: String,
+        required: true,
+    },
+    isEnabled: {
+        type: Boolean,
+        default: true,
+    },
+    description: {
         type: String,
         trim: true,
-    },
-    ip_address: {
-        type: String,
-        trim: true,
-        unique: true,
-        sparse: true,
-    },
-    subnet_mask: {
-        // Subnet Mask của tủ
-        type: String,
-        trim: true,
-        // Có thể thêm regex validation
-    },
-    default_gateway: {
-        // Default Gateway của tủ
-        type: String,
-        trim: true,
-        // Có thể thêm regex validation
-    },
-    main_panel_id: {
-        type: mongoose_1.Schema.Types.ObjectId,
-        ref: "panels",
-        default: null,
-    },
-    status: {
-        type: String,
-        enum: ["Online", "Offline", "Fault"],
-        default: "Online",
     },
 }, {
     timestamps: true,
 });
-panelSchema.index({ panel_type: 1 });
-panelSchema.index({ main_panel_id: 1 });
-const PanelModel = mongoose_1.default.model("panels", panelSchema);
-exports.default = PanelModel;
-//# sourceMappingURL=PanelModel.js.map
+// Unique index: Tên thời gian phải là duy nhất bên trong cùng một Tủ
+timeSchema.index({ panelId: 1, name: 1 }, { unique: true });
+// Index cho panelId để truy vấn nhanh các thời gian trong 1 tủ
+timeSchema.index({ panelId: 1 });
+const TimeModel = mongoose_1.default.model("times", timeSchema);
+exports.default = TimeModel;
+//# sourceMappingURL=TimeModel.js.map
