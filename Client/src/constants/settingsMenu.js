@@ -14,7 +14,7 @@ const settingsMenuKeys = [
     },
     {
         titleKey: "settings.timer",
-        url: "/cai-dat/quan-ly-hen-gio",
+        url: "/cai-dat/quan-ly-dong-ho-hen-gio",
     },
     {
         titleKey: "settings.volume",

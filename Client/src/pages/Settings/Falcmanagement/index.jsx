@@ -103,6 +103,7 @@ function Falcmanagement({ t }) {
                                                             device._id
                                                         )
                                                     }
+                                                    className="bg-[#00000073]"
                                                 />
                                             </div>
                                             <h3 className="text-2xl text-white">

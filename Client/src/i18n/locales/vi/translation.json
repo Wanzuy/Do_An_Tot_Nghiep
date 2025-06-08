@@ -66,7 +66,39 @@
         "zoneName": "Tên vùng",
         "zoneNamePlaceholder": "Nhập tên vùng",
         "description": "Mô tả",
-        "descriptionPlaceholder": "Nhập mô tả"
+        "descriptionPlaceholder": "Nhập mô tả",
+        "loading": "Đang tải dữ liệu...",
+        "nodata": "Không có dữ liệu vùng. Vui lòng thêm vùng mới."
+    },
+    "TimerManagement": {
+        "title": "Quản lý đồng hồ hẹn giờ",
+        "add": "Thêm hẹn giờ mới",
+        "loading": "Đang tải dữ liệu...",
+        "nodata": "Không có dữ liệu hẹn giờ. Vui lòng thêm hẹn giờ mới.",
+        "name": "Tên hẹn giờ",
+        "namePlaceholder": "Nhập tên hẹn giờ",
+        "time": "Thời gian",
+        "timePlaceholder": "Chọn thời gian (vd: 00:30)",
+        "repeat": "Lặp lại",
+        "repeatPlaceholder": "Chọn tần suất lặp lại",
+        "audioFile": "Tệp âm thanh",
+        "audioFilePlaceholder": "Nhập tệp âm thanh",
+        "enabled": "Kích hoạt",
+        "description": "Mô tả",
+        "descriptionPlaceholder": "Nhập mô tả",
+        "monday": "Thứ Hai",
+        "tuesday": "Thứ Ba",
+        "wednesday": "Thứ Tư",
+        "thursday": "Thứ Năm",
+        "friday": "Thứ Sáu",
+        "saturday": "Thứ Bảy",
+        "sunday": "Chủ Nhật",
+        "active": "Hoạt động",
+        "inactive": "Tạm dừng",
+        "edit": "Chỉnh sửa hẹn giờ",
+        "deleteWarning": "Bạn có chắc chắn muốn xóa hẹn giờ này không?",
+        "deleteSuccess": "Hẹn giờ đã được xóa thành công!",
+        "deleteError": "Đã xảy ra lỗi khi xóa hẹn giờ."
     },
     "cabinet": {
         "title": "Tủ trung tâm - Tủ địa chỉ",
@@ -114,6 +146,7 @@
         "config": "Cấu hình",
         "detail": "Chi tiết",
         "invalidIPAddress": "Địa chỉ IP không hợp lệ",
-        "loading": "Đang tải dữ liệu..."
+        "loading": "Đang tải dữ liệu...",
+        "deleteAction": "Hành động này không thể hoàn tác."
     }
 }

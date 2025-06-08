@@ -12,6 +12,14 @@ export const apiEndpoint = {
         updateZone: (zoneId) => `/zones/${zoneId}`,
         deleteZone: (zoneId) => `/zones/${zoneId}`,
     },
+    times: {
+        getAllTimes: "/times",
+        addTime: "/times",
+        getTimeById: (timeId) => `/times/${timeId}`,
+        toggleTime: (timeId) => `/times/${timeId}`,
+        updateTime: (timeId) => `/times/${timeId}`,
+        deleteTime: (timeId) => `/times/${timeId}`,
+    },
     panels: {
         getAllPanels: "/panels",
         getPanelsById: (panelId) => `/panels/${panelId}`,

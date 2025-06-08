@@ -129,8 +129,8 @@ function ZonesManagement({ t }) {
                 {/* Danh sách vùng */}
                 {isLoading ? (
                     <div className="text-white text-center py-8">
-                        <Spin indicator={<LoadingOutlined spin />} /> Đang tải
-                        dữ liệu...
+                        <Spin indicator={<LoadingOutlined spin />} />{" "}
+                        {t("ZonesManagement.loading")}
                     </div>
                 ) : (
                     <div className="bg-[#434343] p-6 rounded-xl text-white shadow-lg border border-white/10">
@@ -143,7 +143,7 @@ function ZonesManagement({ t }) {
                             />
                         ) : (
                             <div className="text-center py-8 text-gray-400">
-                                Không có dữ liệu vùng. Vui lòng thêm vùng mới.
+                                {t("ZonesManagement.nodata")}
                             </div>
                         )}
                     </div>

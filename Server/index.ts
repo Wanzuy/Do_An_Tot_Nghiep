@@ -9,6 +9,7 @@ import detectorRouter from "./src/routers/DetectorRouter";
 import nacBoardRouter from "./src/routers/NacBoardRouter";
 import nacCircuitRouter from "./src/routers/NacCircuitRouter";
 import panelRouter from "./src/routers/PanelRouter";
+import timeRouter from "./src/routers/TimeRouter";
 import EventLogRouter from "./src/routers/EventLogRouter";
 
 dotenv.config();
@@ -26,6 +27,7 @@ app.use("/detectors", detectorRouter);
 app.use("/nacboards", nacBoardRouter);
 app.use("/naccircuits", nacCircuitRouter);
 app.use("/panels", panelRouter);
+app.use("/times", timeRouter);
 app.use("/eventlogs", EventLogRouter);
 
 connectDB()

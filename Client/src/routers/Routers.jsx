@@ -20,6 +20,7 @@ import ZonesManagement from "../pages/Settings/ZonesManagement";
 import CabinetManagement from "../pages/Settings/CabinetManagement";
 import Falcmanagement from "../pages/Settings/Falcmanagement";
 import NacManagement from "../pages/Settings/NacManagement";
+import TimeManagement from "../pages/Settings/TimeManagement";
 
 const ProtectedRoute = ({ element, requiredRole }) => {
     const auth = useSelector(authSelector);
@@ -124,6 +125,15 @@ const Routers = () => {
                                     element={
                                         <ProtectedRoute
                                             element={<ZonesManagement t={t} />}
+                                            requiredRole={[1, 2]}
+                                        />
+                                    }
+                                />
+                                <Route
+                                    path="/cai-dat/quan-ly-dong-ho-hen-gio"
+                                    element={
+                                        <ProtectedRoute
+                                            element={<TimeManagement t={t} />}
                                             requiredRole={[1, 2]}
                                         />
                                     }
