@@ -319,12 +319,9 @@ function TimeManagement({ t }) {
                         ) : (
                             <div className="text-center py-12">
                                 <ClockCircleOutlined className="text-6xl text-gray-500 mb-4" />
-                                <div className="text-gray-400 text-lg">
+                                <div className="text-gray-400 text-[1.8rem]">
                                     {t("TimerManagement.nodata")}
                                 </div>
-                                <p className="text-gray-500 text-sm mt-2">
-                                    Nhấn nút "Thêm" để tạo timer mới
-                                </p>
                             </div>
                         )}
                     </div>
