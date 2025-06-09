@@ -29,4 +29,10 @@ export const apiEndpoint = {
         getAll: "/falcboards",
         updateStatus: (falcId) => `/falcboards/${falcId}/status`,
     },
+    chatbot: {
+        chat: "/api/chatbot/chat",
+        suggestions: "/api/chatbot/suggestions",
+        history: "/api/chatbot/history",
+        clearHistory: "/api/chatbot/history",
+    },
 };

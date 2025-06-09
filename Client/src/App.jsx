@@ -3,6 +3,7 @@ import "@ant-design/v5-patch-for-react-19";
 import Routers from "./routers/Routers";
 import StoreProvider from "./store/StoreProvider";
 import { ToastContainer } from "react-toastify";
+import Chatbot from "./components/ChatbotAI";
 
 function App() {
     return (
@@ -17,6 +18,7 @@ function App() {
         >
             <StoreProvider>
                 <Routers />
+                <Chatbot />
                 <ToastContainer />
             </StoreProvider>
         </ConfigProvider>

@@ -45,7 +45,37 @@ function Dashboard() {
                     {/* Cột thứ hai: Các khối thông tin */}
                     <Col xs={24} md={6}>
                         <div className="min-h-[80vh] bg-[#333333] rounded-lg shadow-lg border border-solid border-[#FFFFFF0D] p-4 flex flex-col gap-4">
-                            {/* Block 1: System Overview */}
+                            {/* Block 1: Notifications */}
+                            <div className="bg-[#444444] rounded p-3 border border-solid border-[#FFFFFF0D]">
+                                <div className="flex items-center justify-between mb-2">
+                                    <div className="text-white font-medium text-3xl">
+                                        Thông báo mới
+                                    </div>
+                                    <div className="bg-[#e53935] text-white text-xl rounded-full w-10 h-10 flex items-center justify-center">
+                                        5
+                                    </div>
+                                </div>
+                                <div className="mt-4 space-y-2">
+                                    <div className="border-b border-[#FFFFFF0D] pb-2">
+                                        <div className="text-[#ccc] text-[1.4rem]">
+                                            Cảnh báo nhiệt độ cao
+                                        </div>
+                                        <div className="text-gray-400 text-lg">
+                                            10 phút trước
+                                        </div>
+                                    </div>
+                                    <div className="border-b border-[#FFFFFF0D] pb-2">
+                                        <div className="text-[#ccc] text-xl">
+                                            Mất kết nối FAC01_008
+                                        </div>
+                                        <div className="text-gray-400 text-lg">
+                                            25 phút trước
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Block 2: System Overview */}
                             <div className="bg-[#444444] rounded p-3 border border-solid border-[#FFFFFF0D]">
                                 <div className="flex items-center justify-between mb-2">
                                     <div className="text-white font-medium text-3xl">
@@ -81,36 +111,6 @@ function Dashboard() {
                                         trailColor="#555"
                                         showInfo={false}
                                     />
-                                </div>
-                            </div>
-
-                            {/* Block 2: Notifications */}
-                            <div className="bg-[#444444] rounded p-3 border border-solid border-[#FFFFFF0D]">
-                                <div className="flex items-center justify-between mb-2">
-                                    <div className="text-white font-medium text-3xl">
-                                        Thông báo mới
-                                    </div>
-                                    <div className="bg-[#e53935] text-white text-xl rounded-full px-2 py-0.5">
-                                        5
-                                    </div>
-                                </div>
-                                <div className="mt-3 space-y-2">
-                                    <div className="border-b border-[#FFFFFF0D] pb-2">
-                                        <div className="text-white text-xl">
-                                            Cảnh báo nhiệt độ cao
-                                        </div>
-                                        <div className="text-gray-400 text-lg">
-                                            10 phút trước
-                                        </div>
-                                    </div>
-                                    <div className="border-b border-[#FFFFFF0D] pb-2">
-                                        <div className="text-white text-xl">
-                                            Mất kết nối FAC01_008
-                                        </div>
-                                        <div className="text-gray-400 text-lg">
-                                            25 phút trước
-                                        </div>
-                                    </div>
                                 </div>
                             </div>
 

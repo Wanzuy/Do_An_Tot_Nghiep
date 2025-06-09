@@ -126,6 +126,10 @@
         "required": "Please fill out this field!",
         "passwordComplexity": "Password must be at least 8 characters long and include uppercase letters, lowercase letters, numbers, and special characters"
     },
+    "chatbotai": {
+        "content": "Hello! I am an AI assistant specialized in fire alarm systems. Feel free to ask me about any system-related issues!",
+        "thinking": "Thinking..."
+    },
     "common": {
         "cancel": "Cancel",
         "save": "Save",

@@ -126,6 +126,10 @@
         "required": "Vui lòng nhập trường này !",
         "passwordComplexity": "Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt"
     },
+    "chatbotai": {
+        "content": "Chào bạn! Tôi là trợ lý AI chuyên về hệ thống báo cháy. Hãy hỏi tôi về các vấn đề liên quan đến hệ thống!",
+        "thinking": "Đang suy nghĩ..."
+    },
     "common": {
         "cancel": "Hủy",
         "save": "Lưu",
