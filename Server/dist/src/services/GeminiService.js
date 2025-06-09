@@ -8,11 +8,51 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.generateQuickSuggestions = exports.generateFireSafetyResponse = exports.generateResponse = void 0;
 const generative_ai_1 = require("@google/generative-ai");
+const PanelModel_1 = __importDefault(require("../models/PanelModel"));
+const VolumeModel_1 = __importDefault(require("../models/VolumeModel"));
+const TimeModel_1 = __importDefault(require("../models/TimeModel"));
 const genAI = new generative_ai_1.GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+// Hàm lấy dữ liệu thực từ database
+const getSystemData = () => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        // Lấy thông tin panels
+        const panels = yield PanelModel_1.default.find({})
+            .select("name panel_type status location")
+            .lean();
+        // Lấy thông tin volume settings của tủ trung tâm
+        const volumes = yield VolumeModel_1.default.find({})
+            .populate("panelId", "name")
+            .select("panelId level updatedAt")
+            .lean();
+        //Lấy thêm các thông tin về hẹn giờ
+        const times = yield TimeModel_1.default.find({})
+            .populate("panelId", "name")
+            .select("panelId time name repeat isEnabled ")
+            .lean();
+        return {
+            panels: panels || [],
+            volumes: volumes || [],
+            times: times || [],
+            lastUpdated: new Date().toISOString(),
+        };
+    }
+    catch (error) {
+        console.error("Lỗi khi lấy dữ liệu hệ thống:", error);
+        return {
+            panels: [],
+            volumes: [],
+            lastUpdated: new Date().toISOString(),
+            error: "Không thể lấy dữ liệu từ hệ thống",
+        };
+    }
+});
 // hàm này dùng để tạo phản hồi từ AI dựa trên prompt(câu hỏi) và context (nếu có).
 const generateResponse = (prompt, context) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -31,8 +71,42 @@ const generateResponse = (prompt, context) => __awaiter(void 0, void 0, void 0, 
 exports.generateResponse = generateResponse;
 // Hàm này dùng để tạo phản hồi từ AI cho các câu hỏi liên quan đến hệ thống báo cháy và an toàn phòng cháy chữa cháy.
 const generateFireSafetyResponse = (userMessage, conversationHistory) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a, _b;
+    // Lấy dữ liệu thực từ hệ thống
+    const systemData = yield getSystemData();
     let systemPrompt = `
     Bạn là một trợ lý AI chuyên về quản lý hệ thống báo cháy và an toàn phòng cháy chữa cháy.
+
+     **THÔNG TIN HỆ THỐNG HIỆN TẠI (Dữ liệu thực từ database):**
+    
+    **Danh sách Panels, tủ báo cháy hiện có:**
+    ${systemData.panels
+        .map((panel) => `- Panel: ${panel.name} 
+         - Loại: ${panel.panel_type}
+         - Trạng thái: ${panel.status || "Không xác định"}
+         - Vị trí: ${panel.location || "Chưa xác định"}`)
+        .join("\n")}
+
+    **Danh sách hẹn giờ hiện có:**
+    ${((_a = systemData.times) !== null && _a !== void 0 ? _a : []).length > 0
+        ? ((_b = systemData.times) !== null && _b !== void 0 ? _b : [])
+            .map((time) => `- Tên: ${time.name} 
+             - Giờ: ${time.time || "Không xác định"}
+             - Lặp lại: ${time.repeat.length > 0 ? time.repeat.join(", ") : "Không"}
+             - Trạng thái: ${time.isEnabled ? "Bật" : "Tắt"}`)
+            .join("\n")
+        : "- Chưa có hẹn giờ nào"}
+
+    **Cài đặt âm lượng hiện có của hệ thống :**
+    ${systemData.volumes.length > 0
+        ? systemData.volumes
+            .map((vol) => `- Mức âm lượng: ${vol.level}%
+             - Cập nhật lần cuối: ${vol.updatedAt || "Không xác định"}`)
+            .join("\n")
+        : "- Chưa có cài đặt âm lượng nào"}
+    
+    **Thông tin cập nhật:** ${systemData.lastUpdated}
+    ${systemData.error ? `**Lưu ý:** ${systemData.error}` : ""}
 
     Bạn có kiến thức sâu rộng và có thể hỗ trợ về:
     - Quản lý người dùng và phân quyền trong hệ thống.
@@ -74,14 +148,9 @@ exports.generateFireSafetyResponse = generateFireSafetyResponse;
 // Hàm này dùng để tạo các gợi ý nhanh cho người dùng
 const generateQuickSuggestions = () => __awaiter(void 0, void 0, void 0, function* () {
     return [
-        "Cách thêm người dùng mới?",
-        "Làm thế nào để thêm hẹn giờ mới?",
-        "Làm thế nào để cấu hình tủ điều khiển?",
-        "Báo cáo các lỗi thiết bị thường gặp?",
-        "Xử lý sự cố báo động giả?",
-        "Xem nhật ký sự kiện của hệ thống?",
-        "Quy trình sửa thông tin tài khoản?",
-        "Quy trình sửa một hẹn giờ?",
+        "Danh sách các tủ báo cháy hiện có?",
+        "Mức âm lượng hiện tại của hệ thống?",
+        "Danh sách các hẹn giờ đã được cấu hình?",
     ];
 });
 exports.generateQuickSuggestions = generateQuickSuggestions;

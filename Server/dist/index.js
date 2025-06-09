@@ -17,6 +17,7 @@ const PanelRouter_1 = __importDefault(require("./src/routers/PanelRouter"));
 const TimeRouter_1 = __importDefault(require("./src/routers/TimeRouter"));
 const EventLogRouter_1 = __importDefault(require("./src/routers/EventLogRouter"));
 const ChatbotRouter_1 = __importDefault(require("./src/routers/ChatbotRouter"));
+const VolumeRouter_1 = __importDefault(require("./src/routers/VolumeRouter"));
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 const port = process.env.PORT || 5000;
@@ -30,6 +31,7 @@ app.use("/nacboards", NacBoardRouter_1.default);
 app.use("/naccircuits", NacCircuitRouter_1.default);
 app.use("/panels", PanelRouter_1.default);
 app.use("/times", TimeRouter_1.default);
+app.use("/volumes", VolumeRouter_1.default);
 app.use("/eventlogs", EventLogRouter_1.default);
 app.use("/api/chatbot", ChatbotRouter_1.default);
 (0, connect_1.default)()

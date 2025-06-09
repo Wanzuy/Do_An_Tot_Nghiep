@@ -164,10 +164,5 @@ export const generateQuickSuggestions = async (): Promise<string[]> => {
         "Danh sách các tủ báo cháy hiện có?",
         "Mức âm lượng hiện tại của hệ thống?",
         "Danh sách các hẹn giờ đã được cấu hình?",
-        "Báo cáo các lỗi thiết bị thường gặp?",
-        "Xử lý sự cố báo động giả?",
-        "Xem nhật ký sự kiện của hệ thống?",
-        "Quy trình sửa thông tin tài khoản?",
-        "Quy trình sửa một hẹn giờ?",
     ];
 };
