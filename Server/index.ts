@@ -11,6 +11,7 @@ import nacCircuitRouter from "./src/routers/NacCircuitRouter";
 import panelRouter from "./src/routers/PanelRouter";
 import timeRouter from "./src/routers/TimeRouter";
 import EventLogRouter from "./src/routers/EventLogRouter";
+import chatbotRouter from "./src/routers/ChatbotRouter";
 
 dotenv.config();
 
@@ -29,6 +30,7 @@ app.use("/naccircuits", nacCircuitRouter);
 app.use("/panels", panelRouter);
 app.use("/times", timeRouter);
 app.use("/eventlogs", EventLogRouter);
+app.use("/api/chatbot", chatbotRouter);
 
 connectDB()
     .then(() => {
