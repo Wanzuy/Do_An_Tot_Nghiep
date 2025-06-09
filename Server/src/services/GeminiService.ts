@@ -1,7 +1,47 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import PanelModel from "../models/PanelModel";
+import VolumeModel from "../models/VolumeModel";
+import TimeModel from "../models/TimeModel";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+// Hàm lấy dữ liệu thực từ database
+const getSystemData = async () => {
+    try {
+        // Lấy thông tin panels
+        const panels = await PanelModel.find({})
+            .select("name panel_type status location")
+            .lean();
+
+        // Lấy thông tin volume settings của tủ trung tâm
+        const volumes = await VolumeModel.find({})
+            .populate("panelId", "name")
+            .select("panelId level updatedAt")
+            .lean();
+
+        //Lấy thêm các thông tin về hẹn giờ
+        const times = await TimeModel.find({})
+            .populate("panelId", "name")
+            .select("panelId time name repeat isEnabled ")
+            .lean();
+
+        return {
+            panels: panels || [],
+            volumes: volumes || [],
+            times: times || [],
+            lastUpdated: new Date().toISOString(),
+        };
+    } catch (error) {
+        console.error("Lỗi khi lấy dữ liệu hệ thống:", error);
+        return {
+            panels: [],
+            volumes: [],
+            lastUpdated: new Date().toISOString(),
+            error: "Không thể lấy dữ liệu từ hệ thống",
+        };
+    }
+};
 
 // hàm này dùng để tạo phản hồi từ AI dựa trên prompt(câu hỏi) và context (nếu có).
 export const generateResponse = async (
@@ -27,8 +67,57 @@ export const generateFireSafetyResponse = async (
     userMessage: string,
     conversationHistory?: any[]
 ): Promise<string> => {
+    // Lấy dữ liệu thực từ hệ thống
+    const systemData = await getSystemData();
+
     let systemPrompt = `
     Bạn là một trợ lý AI chuyên về quản lý hệ thống báo cháy và an toàn phòng cháy chữa cháy.
+
+     **THÔNG TIN HỆ THỐNG HIỆN TẠI (Dữ liệu thực từ database):**
+    
+    **Danh sách Panels, tủ báo cháy hiện có:**
+    ${systemData.panels
+        .map(
+            (panel) =>
+                `- Panel: ${panel.name} 
+         - Loại: ${panel.panel_type}
+         - Trạng thái: ${panel.status || "Không xác định"}
+         - Vị trí: ${panel.location || "Chưa xác định"}`
+        )
+        .join("\n")}
+
+    **Danh sách hẹn giờ hiện có:**
+    ${
+        (systemData.times ?? []).length > 0
+            ? (systemData.times ?? [])
+                  .map(
+                      (time) =>
+                          `- Tên: ${time.name} 
+             - Giờ: ${time.time || "Không xác định"}
+             - Lặp lại: ${
+                 time.repeat.length > 0 ? time.repeat.join(", ") : "Không"
+             }
+             - Trạng thái: ${time.isEnabled ? "Bật" : "Tắt"}`
+                  )
+                  .join("\n")
+            : "- Chưa có hẹn giờ nào"
+    }
+
+    **Cài đặt âm lượng hiện có của hệ thống :**
+    ${
+        systemData.volumes.length > 0
+            ? systemData.volumes
+                  .map(
+                      (vol) =>
+                          `- Mức âm lượng: ${vol.level}%
+             - Cập nhật lần cuối: ${vol.updatedAt || "Không xác định"}`
+                  )
+                  .join("\n")
+            : "- Chưa có cài đặt âm lượng nào"
+    }
+    
+    **Thông tin cập nhật:** ${systemData.lastUpdated}
+    ${systemData.error ? `**Lưu ý:** ${systemData.error}` : ""}
 
     Bạn có kiến thức sâu rộng và có thể hỗ trợ về:
     - Quản lý người dùng và phân quyền trong hệ thống.
@@ -72,9 +161,9 @@ export const generateFireSafetyResponse = async (
 // Hàm này dùng để tạo các gợi ý nhanh cho người dùng
 export const generateQuickSuggestions = async (): Promise<string[]> => {
     return [
-        "Cách thêm người dùng mới?",
-        "Làm thế nào để thêm hẹn giờ mới?",
-        "Làm thế nào để cấu hình tủ điều khiển?",
+        "Danh sách các tủ báo cháy hiện có?",
+        "Mức âm lượng hiện tại của hệ thống?",
+        "Danh sách các hẹn giờ đã được cấu hình?",
         "Báo cáo các lỗi thiết bị thường gặp?",
         "Xử lý sự cố báo động giả?",
         "Xem nhật ký sự kiện của hệ thống?",

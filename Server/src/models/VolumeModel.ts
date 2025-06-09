@@ -16,6 +16,5 @@ const volumeSchema = new Schema(
     { timestamps: true }
 );
 
-volumeSchema.index({ panelId: 1 });
 const VolumeModel = mongoose.model("volumes", volumeSchema);
 export default VolumeModel;
