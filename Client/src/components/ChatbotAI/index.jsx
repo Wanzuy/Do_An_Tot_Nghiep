@@ -85,7 +85,7 @@ function Chatbot() {
                 ...prevMessages.slice(1),
             ]);
         }
-    }, [i18n.language]);
+    }, [i18n.language]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
