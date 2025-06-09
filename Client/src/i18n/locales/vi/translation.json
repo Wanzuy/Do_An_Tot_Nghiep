@@ -7,7 +7,7 @@
         "zone": "Phân vùng quản lý (Zone)",
         "timer": "Đồng hồ hẹn giờ",
         "account": "Quản lý tài khoản",
-        "volume": "Quản lý âm lượng",
+        "volume": "Điều chỉnh âm lượng",
         "cabinet": "Tủ trung tâm - Tủ địa chỉ",
         "problem": "Quản lý sự cố"
     },
@@ -99,6 +99,14 @@
         "deleteWarning": "Bạn có chắc chắn muốn xóa hẹn giờ này không?",
         "deleteSuccess": "Hẹn giờ đã được xóa thành công!",
         "deleteError": "Đã xảy ra lỗi khi xóa hẹn giờ."
+    },
+    "VolumeManagement": {
+        "title": "Điều chỉnh âm lượng",
+        "content": "Điều chỉnh âm lượng đầu ra của CPU",
+        "test": "Thử âm lượng",
+        "changealert": "Có thay đổi chưa được lưu!",
+        "changealertdesc": "Bạn đã thay đổi mức âm lượng. Nhấn 'Lưu' để áp dụng thay đổi hoặc 'Hủy' để quay lại giá trị ban đầu.",
+        "stop": "Dừng phát"
     },
     "cabinet": {
         "title": "Tủ trung tâm - Tủ địa chỉ",

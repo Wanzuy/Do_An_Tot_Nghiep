@@ -21,6 +21,7 @@ import CabinetManagement from "../pages/Settings/CabinetManagement";
 import Falcmanagement from "../pages/Settings/Falcmanagement";
 import NacManagement from "../pages/Settings/NacManagement";
 import TimeManagement from "../pages/Settings/TimeManagement";
+import VolumnManagement from "../pages/Settings/VolumnManagement";
 
 const ProtectedRoute = ({ element, requiredRole }) => {
     const auth = useSelector(authSelector);
@@ -134,6 +135,15 @@ const Routers = () => {
                                     element={
                                         <ProtectedRoute
                                             element={<TimeManagement t={t} />}
+                                            requiredRole={[1, 2]}
+                                        />
+                                    }
+                                />
+                                <Route
+                                    path="/cai-dat/dieu-chinh-am-luong"
+                                    element={
+                                        <ProtectedRoute
+                                            element={<VolumnManagement t={t} />}
                                             requiredRole={[1, 2]}
                                         />
                                     }

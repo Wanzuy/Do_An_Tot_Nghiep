@@ -18,7 +18,7 @@ const settingsMenuKeys = [
     },
     {
         titleKey: "settings.volume",
-        url: "/cai-dat/quan-ly-am-luong",
+        url: "/cai-dat/dieu-chinh-am-luong",
     },
     {
         titleKey: "settings.account",

@@ -100,6 +100,14 @@
         "deleteSuccess": "Timer has been successfully deleted!",
         "deleteError": "An error occurred while deleting the timer."
     },
+    "VolumeManagement": {
+        "title": "Volume Adjustment",
+        "content": "Adjust the output volume of the CPU",
+        "test": "Test Volume",
+        "changealert": "Have unsaved changes!",
+        "changealertdesc": "You have changed the volume level. Click 'Save' to apply changes or 'Cancel' to revert to the original value.",
+        "stop": "Stop Playback"
+    },
     "cabinet": {
         "title": "Main Panel - Addressable Panel",
         "detailTitle": "Information details",

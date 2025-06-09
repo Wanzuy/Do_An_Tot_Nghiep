@@ -25,6 +25,12 @@ export const apiEndpoint = {
         getPanelsById: (panelId) => `/panels/${panelId}`,
         updatePanel: (panelId) => `/panels/${panelId}`,
     },
+    volumes: {
+        getVolumeByPanel: (panelId) => `/volumes/panel/${panelId}`,
+        createVolume: "/volumes",
+        updateVolume: (volumeId) => `/volumes/${volumeId}`,
+        testVolume: (volumeId) => `/volumes/${volumeId}/test`,
+    },
     falc: {
         getAll: "/falcboards",
         updateStatus: (falcId) => `/falcboards/${falcId}/status`,
