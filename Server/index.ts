@@ -12,6 +12,7 @@ import panelRouter from "./src/routers/PanelRouter";
 import timeRouter from "./src/routers/TimeRouter";
 import EventLogRouter from "./src/routers/EventLogRouter";
 import chatbotRouter from "./src/routers/ChatbotRouter";
+import volumeRouter from "./src/routers/VolumeRouter";
 
 dotenv.config();
 
@@ -29,6 +30,7 @@ app.use("/nacboards", nacBoardRouter);
 app.use("/naccircuits", nacCircuitRouter);
 app.use("/panels", panelRouter);
 app.use("/times", timeRouter);
+app.use("/volumes", volumeRouter);
 app.use("/eventlogs", EventLogRouter);
 app.use("/api/chatbot", chatbotRouter);
 
