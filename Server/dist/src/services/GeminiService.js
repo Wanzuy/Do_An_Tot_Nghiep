@@ -24,7 +24,7 @@ const getSystemData = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         // Lấy thông tin panels
         const panels = yield PanelModel_1.default.find({})
-            .select("name panel_type status location")
+            .select("name panel_type status location loops_supported ram_usage cpu_usage")
             .lean();
         // Lấy thông tin volume settings của tủ trung tâm
         const volumes = yield VolumeModel_1.default.find({})
@@ -84,6 +84,9 @@ const generateFireSafetyResponse = (userMessage, conversationHistory) => __await
         .map((panel) => `- Panel: ${panel.name} 
          - Loại: ${panel.panel_type}
          - Trạng thái: ${panel.status || "Không xác định"}
+         - Số lượng loop hỗ trợ: ${panel.loops_supported || "Không xác định"}
+         - Sử dụng tài nguyên, tiêu thụ RAM: ${panel.ram_usage || "Không xác định"}%     
+         - Sử dụng tài nguyên, tiêu thụ CPU: ${panel.cpu_usage || "Không xác định"}%    
          - Vị trí: ${panel.location || "Chưa xác định"}`)
         .join("\n")}
 

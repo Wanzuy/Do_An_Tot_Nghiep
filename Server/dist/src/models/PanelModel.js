@@ -79,6 +79,26 @@ const panelSchema = new mongoose_1.Schema({
         enum: ["Online", "Offline", "Fault"],
         default: "Online",
     },
+    loops_supported: {
+        // Số lượng loop mà panel này hỗ trợ
+        type: Number,
+        min: 0,
+        default: 0,
+    },
+    ram_usage: {
+        // Phần trăm RAM đang sử dụng (0-100%)
+        type: Number,
+        min: 0,
+        max: 100,
+        default: 0,
+    },
+    cpu_usage: {
+        // Phần trăm CPU đang sử dụng (0-100%)
+        type: Number,
+        min: 0,
+        max: 100,
+        default: 0,
+    },
 }, {
     timestamps: true,
 });

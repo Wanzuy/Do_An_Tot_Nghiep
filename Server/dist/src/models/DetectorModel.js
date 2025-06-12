@@ -36,21 +36,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importStar(require("mongoose"));
 const detectorSchema = new mongoose_1.Schema({
     falcBoardId: {
-        // Liên kết đến vòng lặp mà đầu báo này thuộc về
+        // Liên kết đến bo mạch FALC mà đầu báo này thuộc về
         type: mongoose_1.Schema.Types.ObjectId,
         ref: "falcboards",
         required: true,
     },
-    loop_number: {
-        // Số thứ tự vòng lặp MÀ đầu báo này thuộc về TRÊN BO MẠCH đó
+    detector_address: {
+        // Địa chỉ của đầu báo trên bo mạch (quan trọng với hệ thống địa chỉ)
         type: Number,
         required: true,
-    },
-    detector_address: {
-        // Địa chỉ của đầu báo trên vòng lặp (quan trọng với hệ thống địa chỉ)
-        type: String,
-        required: true,
-        // unique: true, // Có thể unique trong toàn hệ thống hoặc chỉ trong loop tùy kiến trúc
+        min: 1,
+        unique: true,
     },
     name: {
         // Tên gợi nhớ cho đầu báo, ví dụ: Dau bao khoi p.201A
@@ -67,7 +63,7 @@ const detectorSchema = new mongoose_1.Schema({
         // Liên kết đến Phân vùng (Zone) mà đầu báo này thuộc về
         type: mongoose_1.Schema.Types.ObjectId,
         ref: "zones",
-        required: true,
+        default: null,
     },
     status: {
         // Trạng thái hiện tại (Normal (Đầu báo đang hoạt động bình thường, không có lỗi), Alarm (Đầu báo phát hiện sự cố, cảnh báo), Fault (Đầu báo gặp sự cố hoặc lỗi), Disabled (Đầu báo bị tắt hoặc không hoạt động))
@@ -92,8 +88,8 @@ const detectorSchema = new mongoose_1.Schema({
 }, {
     timestamps: true, // Tự động thêm createdAt và updatedAt
 });
-// Index và unique constraint: Địa chỉ đầu báo phải là duy nhất trong một Vòng Lặp CỤ THỂ trên một Bo mạch CỤ THỂ.
-detectorSchema.index({ falcBoardId: 1, loop_number: 1, detector_address: 1 }, { unique: true });
+// Indexes for performance optimization
+detectorSchema.index({ falcBoardId: 1 });
 detectorSchema.index({ zoneId: 1 });
 detectorSchema.index({ status: 1 });
 const DetectorModel = mongoose_1.default.model("detectors", detectorSchema);

@@ -64,19 +64,13 @@ const falcBoardSchema = new mongoose_1.Schema({
         enum: ["Normal", "Fault", "Offline"],
         default: "Normal",
     },
-    loop_count: {
-        // Trường để lưu SỐ LƯỢNG VÒNG LẶP trên bo mạch này (ví dụ: 2, 4)
-        type: Number,
-        required: true,
-        min: 1,
-    },
     number_of_detectors: {
-        // Trường để lưu SỐ LƯỢNG THIẾT BỊ TỐI ĐA TRONG MỘT VÒNG LẶP
-        // Ý nghĩa: Mỗi vòng lặp của bo mạch này hỗ trợ tối đa bao nhiêu thiết bị địa chỉ
+        // Trường để lưu SỐ LƯỢNG THIẾT BỊ TỐI ĐA MÀ BO MẠCH NÀY HỖ TRỢ
+        // Ý nghĩa: Bo mạch này hỗ trợ tối đa bao nhiêu thiết bị địa chỉ
         type: Number,
         required: true,
         min: 1,
-        // Có thể thêm max tùy giới hạn kỹ thuật thực tế (ví dụ: max: 159)
+        max: 200,
     },
 }, {
     timestamps: true,

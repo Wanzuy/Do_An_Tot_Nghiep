@@ -8,112 +8,121 @@ const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
 // Hàm lấy dữ liệu thực từ database
 const getSystemData = async () => {
-    try {
-        // Lấy thông tin panels
-        const panels = await PanelModel.find({})
-            .select("name panel_type status location")
-            .lean();
+  try {
+    // Lấy thông tin panels
+    const panels = await PanelModel.find({})
+      .select(
+        "name panel_type status location loops_supported ram_usage cpu_usage"
+      )
+      .lean();
 
-        // Lấy thông tin volume settings của tủ trung tâm
-        const volumes = await VolumeModel.find({})
-            .populate("panelId", "name")
-            .select("panelId level updatedAt")
-            .lean();
+    // Lấy thông tin volume settings của tủ trung tâm
+    const volumes = await VolumeModel.find({})
+      .populate("panelId", "name")
+      .select("panelId level updatedAt")
+      .lean();
 
-        //Lấy thêm các thông tin về hẹn giờ
-        const times = await TimeModel.find({})
-            .populate("panelId", "name")
-            .select("panelId time name repeat isEnabled ")
-            .lean();
+    //Lấy thêm các thông tin về hẹn giờ
+    const times = await TimeModel.find({})
+      .populate("panelId", "name")
+      .select("panelId time name repeat isEnabled ")
+      .lean();
 
-        return {
-            panels: panels || [],
-            volumes: volumes || [],
-            times: times || [],
-            lastUpdated: new Date().toISOString(),
-        };
-    } catch (error) {
-        console.error("Lỗi khi lấy dữ liệu hệ thống:", error);
-        return {
-            panels: [],
-            volumes: [],
-            lastUpdated: new Date().toISOString(),
-            error: "Không thể lấy dữ liệu từ hệ thống",
-        };
-    }
+    return {
+      panels: panels || [],
+      volumes: volumes || [],
+      times: times || [],
+      lastUpdated: new Date().toISOString(),
+    };
+  } catch (error) {
+    console.error("Lỗi khi lấy dữ liệu hệ thống:", error);
+    return {
+      panels: [],
+      volumes: [],
+      lastUpdated: new Date().toISOString(),
+      error: "Không thể lấy dữ liệu từ hệ thống",
+    };
+  }
 };
 
 // hàm này dùng để tạo phản hồi từ AI dựa trên prompt(câu hỏi) và context (nếu có).
 export const generateResponse = async (
-    prompt: string,
-    context?: string
+  prompt: string,
+  context?: string
 ): Promise<string> => {
-    try {
-        const fullPrompt = context
-            ? `Context: ${context}\n\nQuestion: ${prompt}`
-            : prompt;
+  try {
+    const fullPrompt = context
+      ? `Context: ${context}\n\nQuestion: ${prompt}`
+      : prompt;
 
-        const result = await model.generateContent(fullPrompt);
-        const response = await result.response;
-        return response.text();
-    } catch (error) {
-        console.error("Gemini API error:", error);
-        throw new Error("Không thể tạo phản hồi từ AI");
-    }
+    const result = await model.generateContent(fullPrompt);
+    const response = await result.response;
+    return response.text();
+  } catch (error) {
+    console.error("Gemini API error:", error);
+    throw new Error("Không thể tạo phản hồi từ AI");
+  }
 };
 
 // Hàm này dùng để tạo phản hồi từ AI cho các câu hỏi liên quan đến hệ thống báo cháy và an toàn phòng cháy chữa cháy.
 export const generateFireSafetyResponse = async (
-    userMessage: string,
-    conversationHistory?: any[]
+  userMessage: string,
+  conversationHistory?: any[]
 ): Promise<string> => {
-    // Lấy dữ liệu thực từ hệ thống
-    const systemData = await getSystemData();
+  // Lấy dữ liệu thực từ hệ thống
+  const systemData = await getSystemData();
 
-    let systemPrompt = `
+  let systemPrompt = `
     Bạn là một trợ lý AI chuyên về quản lý hệ thống báo cháy và an toàn phòng cháy chữa cháy.
 
      **THÔNG TIN HỆ THỐNG HIỆN TẠI (Dữ liệu thực từ database):**
     
     **Danh sách Panels, tủ báo cháy hiện có:**
     ${systemData.panels
-        .map(
-            (panel) =>
-                `- Panel: ${panel.name} 
+      .map(
+        (panel) =>
+          `- Panel: ${panel.name} 
          - Loại: ${panel.panel_type}
          - Trạng thái: ${panel.status || "Không xác định"}
+         - Số lượng loop hỗ trợ: ${panel.loops_supported || "Không xác định"}
+         - Sử dụng tài nguyên, tiêu thụ RAM: ${
+           panel.ram_usage || "Không xác định"
+         }%     
+         - Sử dụng tài nguyên, tiêu thụ CPU: ${
+           panel.cpu_usage || "Không xác định"
+         }%    
          - Vị trí: ${panel.location || "Chưa xác định"}`
-        )
-        .join("\n")}
+      )
+      .join("\n")}
 
     **Danh sách hẹn giờ hiện có:**
     ${
-        (systemData.times ?? []).length > 0
-            ? (systemData.times ?? [])
-                  .map(
-                      (time) =>
-                          `- Tên: ${time.name} 
+      (systemData.times ?? []).length > 0
+        ? (systemData.times ?? [])
+            .map(
+              (time) =>
+                `- Tên: ${time.name} 
              - Giờ: ${time.time || "Không xác định"}
              - Lặp lại: ${
-                 time.repeat.length > 0 ? time.repeat.join(", ") : "Không"
+               time.repeat.length > 0 ? time.repeat.join(", ") : "Không"
              }
              - Trạng thái: ${time.isEnabled ? "Bật" : "Tắt"}`
-                  )
-                  .join("\n")
-            : "- Chưa có hẹn giờ nào"
+            )
+            .join("\n")
+        : "- Chưa có hẹn giờ nào"
     }
 
     **Cài đặt âm lượng hiện có của hệ thống :**
     ${
-        systemData.volumes.length > 0
-            ? systemData.volumes
-                  .map(
-                      (vol) =>
-                          `- Mức âm lượng: ${vol.level}%
+      systemData.volumes.length > 0
+        ? systemData.volumes
+            .map(
+              (vol) =>
+                `- Mức âm lượng: ${vol.level}%
              - Cập nhật lần cuối: ${vol.updatedAt || "Không xác định"}`
-                  )
-                  .join("\n")
-            : "- Chưa có cài đặt âm lượng nào"
+            )
+            .join("\n")
+        : "- Chưa có cài đặt âm lượng nào"
     }
     
     **Thông tin cập nhật:** ${systemData.lastUpdated}
@@ -146,23 +155,23 @@ export const generateFireSafetyResponse = async (
     - Nếu người dùng yêu cầu xưng hô sai quy tắc, từ chối một cách lịch sự và giải thích lý do để duy trì sự lịch thiệp và chuyên nghiệp [[3](https://saylordotorg.github.io/text_handbook-for-writers/s20-05-avoiding-sexist-and-offensive-.html)].
     `;
 
-    // Thêm context từ lịch sử hội thoại
-    if (conversationHistory && conversationHistory.length > 0) {
-        const recentHistory = conversationHistory
-            .slice(-7) // Lấy 5 tin nhắn gần nhất
-            .map((msg: any) => `${msg.role}: ${msg.content}`)
-            .join("\n");
-        systemPrompt += `\n\nLịch sử hội thoại gần đây:\n${recentHistory}`;
-    }
+  // Thêm context từ lịch sử hội thoại
+  if (conversationHistory && conversationHistory.length > 0) {
+    const recentHistory = conversationHistory
+      .slice(-7) // Lấy 5 tin nhắn gần nhất
+      .map((msg: any) => `${msg.role}: ${msg.content}`)
+      .join("\n");
+    systemPrompt += `\n\nLịch sử hội thoại gần đây:\n${recentHistory}`;
+  }
 
-    return generateResponse(userMessage, systemPrompt);
+  return generateResponse(userMessage, systemPrompt);
 };
 
 // Hàm này dùng để tạo các gợi ý nhanh cho người dùng
 export const generateQuickSuggestions = async (): Promise<string[]> => {
-    return [
-        "Danh sách các tủ báo cháy hiện có?",
-        "Mức âm lượng hiện tại của hệ thống?",
-        "Danh sách các hẹn giờ đã được cấu hình?",
-    ];
+  return [
+    "Danh sách các tủ báo cháy hiện có?",
+    "Mức âm lượng hiện tại của hệ thống?",
+    "Danh sách các hẹn giờ đã được cấu hình?",
+  ];
 };

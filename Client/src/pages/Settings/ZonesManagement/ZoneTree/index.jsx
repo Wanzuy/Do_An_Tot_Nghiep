@@ -1,117 +1,121 @@
 import React, { useState } from "react";
 import {
-    CaretDownOutlined,
-    CaretRightOutlined,
-    EditOutlined,
-    DeleteOutlined,
-    MoreOutlined,
+  CaretDownOutlined,
+  CaretRightOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  MoreOutlined,
+  LinkOutlined,
 } from "@ant-design/icons";
 import { Dropdown } from "antd";
 
-const ZoneItem = ({ t, zone, level = 0, onEdit, onDelete }) => {
-    const [expanded, setExpanded] = useState(true);
-    const hasChildren = zone.children && zone.children.length > 0;
+const ZoneItem = ({ t, zone, level = 0, onEdit, onDelete, onAssignDevice }) => {
+  const [expanded, setExpanded] = useState(true);
+  const hasChildren = zone.children && zone.children.length > 0;
 
-    const toggleExpanded = () => {
-        setExpanded(!expanded);
-    };
+  const toggleExpanded = () => {
+    setExpanded(!expanded);
+  };
 
-    const handleAction = (e) => {
-        if (e.key === "edit") {
-            onEdit(zone);
-        } else if (e.key === "delete") {
-            onDelete(zone);
-        }
-    };
+  const handleAction = (e) => {
+    if (e.key === "edit") {
+      onEdit(zone);
+    } else if (e.key === "delete") {
+      onDelete(zone);
+    } else if (e.key === "assign") {
+      onAssignDevice(zone);
+    }
+  };
 
-    const menuItems = [
-        {
-            key: "edit",
-            label: t("common.edit"),
-            icon: <EditOutlined />,
-        },
-        {
-            key: "delete",
-            label: t("common.delete"),
-            icon: <DeleteOutlined />,
-            danger: true,
-        },
-    ];
+  const menuItems = [
+    {
+      key: "edit",
+      label: t("common.edit"),
+      icon: <EditOutlined />,
+    },
 
-    return (
-        <div>
-            <div
-                className="flex items-center p-2 hover:bg-gray-700/30 rounded-lg transition-all"
-                style={{ paddingLeft: `${level * 24 + 12}px` }}
-            >
-                {hasChildren ? (
-                    <span
-                        className="mr-2 cursor-pointer p-1"
-                        onClick={toggleExpanded}
-                    >
-                        {expanded ? (
-                            <CaretDownOutlined />
-                        ) : (
-                            <CaretRightOutlined />
-                        )}
-                    </span>
-                ) : (
-                    <span className="mr-2 w-[16px]"></span> // Khoảng trống để căn chỉnh
-                )}
+    {
+      key: "delete",
+      label: t("common.delete"),
+      icon: <DeleteOutlined />,
+      danger: true,
+    },
+    {
+      key: "assign",
+      label: t("ZonesManagement.assignDevice") || "Gán thiết bị",
+      icon: <LinkOutlined />,
+    },
+  ];
 
-                <span className="flex flex-grow items-center truncate whitespace-nowrap overflow-hidden text-[1.6rem]">
-                    <strong className="text-[1.8rem] mr-1 shrink-0">
-                        {t("ZonesManagement.zone")}
-                    </strong>
-                    <span className="truncate">{zone.name}</span>
-                </span>
+  return (
+    <div>
+      <div
+        className="flex items-center p-2 hover:bg-gray-700/30 rounded-lg transition-all"
+        style={{ paddingLeft: `${level * 24 + 12}px` }}
+      >
+        {hasChildren ? (
+          <span className="mr-2 cursor-pointer p-1" onClick={toggleExpanded}>
+            {expanded ? <CaretDownOutlined /> : <CaretRightOutlined />}
+          </span>
+        ) : (
+          <span className="mr-2 w-[16px]"></span> // Khoảng trống để căn chỉnh
+        )}
 
-                <Dropdown
-                    menu={{
-                        items: menuItems,
-                        onClick: handleAction,
-                    }}
-                    trigger={["click"]}
-                    placement="bottomRight"
-                >
-                    <button className="text-gray-300 hover:text-white p-2">
-                        <MoreOutlined />
-                    </button>
-                </Dropdown>
-            </div>
+        <span className="flex flex-grow items-center truncate whitespace-nowrap overflow-hidden text-[1.6rem]">
+          <strong className="text-[1.8rem] mr-1 shrink-0">
+            {t("ZonesManagement.zone")}
+          </strong>
+          <span className="truncate">{zone.name}</span>
+        </span>
 
-            {hasChildren && expanded && (
-                <div className="zone-children">
-                    {zone.children.map((child) => (
-                        <ZoneItem
-                            key={child._id}
-                            zone={child}
-                            level={level + 1}
-                            onEdit={onEdit}
-                            onDelete={onDelete}
-                            t={t}
-                        />
-                    ))}
-                </div>
-            )}
+        <Dropdown
+          menu={{
+            items: menuItems,
+            onClick: handleAction,
+          }}
+          trigger={["click"]}
+          placement="bottomRight"
+        >
+          <button className="text-gray-300 hover:text-white p-2">
+            <MoreOutlined />
+          </button>
+        </Dropdown>
+      </div>
+
+      {hasChildren && expanded && (
+        <div className="zone-children">
+          {zone.children.map((child) => (
+            <ZoneItem
+              key={child._id}
+              zone={child}
+              level={level + 1}
+              onEdit={onEdit}
+              onDelete={onDelete}
+              onAssignDevice={onAssignDevice}
+              t={t}
+            />
+          ))}
         </div>
-    );
+      )}
+    </div>
+  );
 };
 
-const ZoneTree = ({ t, zones, onEdit, onDelete }) => {
-    return (
-        <div className="zone-tree">
-            {zones.map((zone) => (
-                <ZoneItem
-                    key={zone._id}
-                    zone={zone}
-                    onEdit={onEdit}
-                    onDelete={onDelete}
-                    t={t}
-                />
-            ))}
-        </div>
-    );
+const ZoneTree = ({ t, zones, onEdit, onDelete, onAssignDevice }) => {
+  return (
+    <div className="zone-tree">
+      {zones.map((zone) => (
+        <ZoneItem
+          key={zone._id}
+          zone={zone}
+          onEdit={onEdit}
+          onDelete={onDelete}
+          onAssignDevice={onAssignDevice}
+          t={t}
+        />
+      ))}
+    </div>
+  );
 };
 
 export default ZoneTree;

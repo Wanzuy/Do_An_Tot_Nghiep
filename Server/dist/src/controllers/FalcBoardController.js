@@ -21,6 +21,7 @@ const DetectorModel_1 = __importDefault(require("../models/DetectorModel"));
  * Create a new FALC board
  */
 const createFalcBoard = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     try {
         // Kiểm tra panelId có được cung cấp và hợp lệ không
         if (!req.body.panelId ||
@@ -29,14 +30,32 @@ const createFalcBoard = (req, res) => __awaiter(void 0, void 0, void 0, function
                 success: false,
                 message: "Panel ID không hợp lệ hoặc bị thiếu.",
             });
-        } // Kiểm tra panelId có tồn tại trong collection Panel không
+        }
+        // Kiểm tra number_of_detectors có hợp lệ không
+        if (req.body.number_of_detectors !== undefined) {
+            const numberOfDetectors = Number(req.body.number_of_detectors);
+            if (isNaN(numberOfDetectors) || numberOfDetectors < 1) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Số lượng đầu báo phải là số nguyên dương (≥ 1).",
+                });
+            }
+            if (numberOfDetectors > 200) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Số lượng đầu báo không được vượt quá 200.",
+                });
+            }
+        }
+        // Kiểm tra panelId có tồn tại trong collection Panel không
         const panel = yield PanelModel_1.default.findById(req.body.panelId);
         if (!panel) {
             return res.status(404).json({
                 success: false,
                 message: "Không tìm thấy tủ (Panel) với ID " + req.body.panelId,
             });
-        } // Tạo FalcBoard mới bằng cách truyền trực tiếp req.body
+        }
+        // Tạo FalcBoard mới bằng cách truyền trực tiếp req.body
         const newFalcBoard = new FalcBoardModel_1.default(req.body); // Mongoose sẽ tự động lấy các trường trong schema
         const savedFalcBoard = yield newFalcBoard.save(); // Lưu vào database
         // Populate panelId trước khi trả về
@@ -48,7 +67,8 @@ const createFalcBoard = (req, res) => __awaiter(void 0, void 0, void 0, function
         });
     }
     catch (error) {
-        console.error("Lỗi khi tạo bo mạch FALC:", error); // Log lỗi chi tiết // Xử lý lỗi unique index kết hợp (panelId + name)
+        console.error("Lỗi khi tạo bo mạch FALC:", error); // Log lỗi chi tiết
+        // Xử lý lỗi unique index kết hợp (panelId + name)
         if (error.code === 11000) {
             res.status(400).json({
                 success: false,
@@ -56,10 +76,26 @@ const createFalcBoard = (req, res) => __awaiter(void 0, void 0, void 0, function
             });
         }
         else if (error.name === "ValidationError") {
-            // Lỗi validation của Mongoose
+            // Xử lý lỗi validation của Mongoose
+            let errorMessage = "Lỗi xác thực dữ liệu: ";
+            // Xử lý cụ thể cho từng trường validation
+            if ((_a = error.errors) === null || _a === void 0 ? void 0 : _a.number_of_detectors) {
+                if (error.errors.number_of_detectors.kind === "max") {
+                    errorMessage = "Số lượng đầu báo không được vượt quá 200.";
+                }
+                else if (error.errors.number_of_detectors.kind === "min") {
+                    errorMessage = "Số lượng đầu báo phải lớn hơn hoặc bằng 1.";
+                }
+                else {
+                    errorMessage = "Số lượng đầu báo không hợp lệ.";
+                }
+            }
+            else {
+                errorMessage += error.message;
+            }
             res.status(400).json({
                 success: false,
-                message: "Lỗi xác thực dữ liệu: " + error.message,
+                message: errorMessage,
             });
         }
         else {
@@ -89,11 +125,18 @@ const getAllFalcBoards = (req, res) => __awaiter(void 0, void 0, void 0, functio
         }
         const falcBoards = yield FalcBoardModel_1.default.find(query)
             .populate("panelId", "name panel_type") // Populate panelId
-            .sort({ createdAt: -1 }); // Mặc định sắp xếp theo thời gian tạo giảm dần
+            .sort({ createdAt: 1 }); // Sắp xếp theo thời gian tạo tăng dần (cũ nhất lên đầu)
+        // Thêm số lượng detector hiện có cho mỗi falc board
+        const falcBoardsWithDetectorCount = yield Promise.all(falcBoards.map((board) => __awaiter(void 0, void 0, void 0, function* () {
+            const detectorCount = yield DetectorModel_1.default.countDocuments({
+                falcBoardId: board._id,
+            });
+            return Object.assign(Object.assign({}, board.toObject()), { current_detector_count: detectorCount });
+        })));
         res.status(200).json({
             success: true,
-            count: falcBoards.length,
-            data: falcBoards,
+            count: falcBoardsWithDetectorCount.length,
+            data: falcBoardsWithDetectorCount,
         });
     }
     catch (error) {
@@ -107,8 +150,7 @@ const getAllFalcBoards = (req, res) => __awaiter(void 0, void 0, void 0, functio
         }
         res.status(500).json({
             success: false,
-            message: error.message ||
-                "Đã xảy ra lỗi khi lấy danh sách bo mạch FALC.",
+            message: error.message || "Đã xảy ra lỗi khi lấy danh sách bo mạch FALC.",
         });
     }
 });
@@ -135,9 +177,15 @@ const getFalcBoardById = (req, res) => __awaiter(void 0, void 0, void 0, functio
             });
             return;
         }
+        // Tính toán số lượng detector hiện có
+        const detectorCount = yield DetectorModel_1.default.countDocuments({
+            falcBoardId: falcBoard._id,
+        });
+        // Thêm current_detector_count vào dữ liệu trả về
+        const falcBoardWithDetectorCount = Object.assign(Object.assign({}, falcBoard.toObject()), { current_detector_count: detectorCount });
         res.status(200).json({
             success: true,
-            data: falcBoard,
+            data: falcBoardWithDetectorCount,
         });
     }
     catch (error) {
@@ -151,8 +199,7 @@ const getFalcBoardById = (req, res) => __awaiter(void 0, void 0, void 0, functio
         }
         res.status(500).json({
             success: false,
-            message: error.message ||
-                "Lỗi khi lấy bo mạch FALC với ID " + req.params.id,
+            message: error.message || "Lỗi khi lấy bo mạch FALC với ID " + req.params.id,
         });
     }
 });
@@ -189,8 +236,7 @@ const updateFalcBoard = (req, res) => __awaiter(void 0, void 0, void 0, function
                 if (!panel) {
                     return res.status(404).json({
                         success: false,
-                        message: "Không tìm thấy tủ (Panel) với ID mới " +
-                            req.body.panelId,
+                        message: "Không tìm thấy tủ (Panel) với ID mới " + req.body.panelId,
                     });
                 }
             }
@@ -204,10 +250,16 @@ const updateFalcBoard = (req, res) => __awaiter(void 0, void 0, void 0, function
             });
             return;
         }
+        // Tính toán số lượng detector hiện có cho board vừa được update
+        const detectorCount = yield DetectorModel_1.default.countDocuments({
+            falcBoardId: updatedFalcBoard._id,
+        });
+        // Thêm current_detector_count vào dữ liệu trả về
+        const falcBoardWithDetectorCount = Object.assign(Object.assign({}, updatedFalcBoard.toObject()), { current_detector_count: detectorCount });
         res.status(200).json({
             success: true,
             message: "Cập nhật bo mạch FALC thành công.",
-            data: updatedFalcBoard,
+            data: falcBoardWithDetectorCount,
         });
     }
     catch (error) {
@@ -287,10 +339,16 @@ const updateFalcBoardStatus = (req, res) => __awaiter(void 0, void 0, void 0, fu
             }
         }
         const updatedFalcBoard = yield falcBoard.save(); // Lưu thay đổi
+        // Tính toán số lượng detector hiện có cho board vừa được update
+        const detectorCount = yield DetectorModel_1.default.countDocuments({
+            falcBoardId: updatedFalcBoard._id,
+        });
+        // Thêm current_detector_count vào dữ liệu trả về
+        const falcBoardWithDetectorCount = Object.assign(Object.assign({}, updatedFalcBoard.toObject()), { current_detector_count: detectorCount });
         res.status(200).json({
             success: true,
             message: "Cập nhật trạng thái bo mạch FALC thành công.",
-            data: updatedFalcBoard,
+            data: falcBoardWithDetectorCount,
         });
     }
     catch (error) {
@@ -363,8 +421,7 @@ const deleteFalcBoard = (req, res) => __awaiter(void 0, void 0, void 0, function
         }
         res.status(500).json({
             success: false,
-            message: error.message ||
-                "Không thể xóa bo mạch FALC với ID " + req.params.id,
+            message: error.message || "Không thể xóa bo mạch FALC với ID " + req.params.id,
         });
     }
 });
@@ -389,10 +446,17 @@ const getFalcBoardsByPanelId = (req, res) => __awaiter(void 0, void 0, void 0, f
         const falcBoards = yield FalcBoardModel_1.default.find({ panelId }) // Lọc theo panelId
             .populate("panelId", "name panel_type") // Populate panelId
             .sort({ createdAt: -1 });
+        // Thêm số lượng detector hiện có cho mỗi falc board
+        const falcBoardsWithDetectorCount = yield Promise.all(falcBoards.map((board) => __awaiter(void 0, void 0, void 0, function* () {
+            const detectorCount = yield DetectorModel_1.default.countDocuments({
+                falcBoardId: board._id,
+            });
+            return Object.assign(Object.assign({}, board.toObject()), { current_detector_count: detectorCount });
+        })));
         res.status(200).json({
             success: true,
-            count: falcBoards.length,
-            data: falcBoards,
+            count: falcBoardsWithDetectorCount.length,
+            data: falcBoardsWithDetectorCount,
         });
     }
     catch (error) {

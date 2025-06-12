@@ -32,16 +32,48 @@ const createPanel = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
             if (!mainPanel) {
                 return res.status(404).json({
                     success: false,
-                    message: "Không tìm thấy tủ trung tâm với ID " +
-                        req.body.main_panel_id,
+                    message: "Không tìm thấy tủ trung tâm với ID " + req.body.main_panel_id,
                 });
             }
         }
+        // --- Validation cho các trường mới ---
+        // Kiểm tra loops_supported
+        if (req.body.loops_supported !== undefined) {
+            if (typeof req.body.loops_supported !== "number" ||
+                req.body.loops_supported < 0) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Số lượng loops hỗ trợ phải là số không âm.",
+                });
+            }
+        }
+        // Kiểm tra ram_usage
+        if (req.body.ram_usage !== undefined) {
+            if (typeof req.body.ram_usage !== "number" ||
+                req.body.ram_usage < 0 ||
+                req.body.ram_usage > 100) {
+                return res.status(400).json({
+                    success: false,
+                    message: "RAM usage phải là số từ 0 đến 100%.",
+                });
+            }
+        }
+        // Kiểm tra cpu_usage
+        if (req.body.cpu_usage !== undefined) {
+            if (typeof req.body.cpu_usage !== "number" ||
+                req.body.cpu_usage < 0 ||
+                req.body.cpu_usage > 100) {
+                return res.status(400).json({
+                    success: false,
+                    message: "CPU usage phải là số từ 0 đến 100%.",
+                });
+            }
+        }
+        // --- Kết thúc validation cho các trường mới ---
         // Tạo Panel mới bằng cách truyền trực tiếp req.body
         const newPanel = new PanelModel_1.default(req.body);
-        const savedPanel = yield newPanel.save();
-        // Populate thông tin tủ cha trước khi trả về
-        const result = yield PanelModel_1.default.findById(savedPanel._id).populate("main_panel_id", "name panel_type ip_address");
+        const savedPanel = yield newPanel.save(); // Populate thông tin tủ cha trước khi trả về
+        const result = yield PanelModel_1.default.findById(savedPanel._id).populate("main_panel_id", "name panel_type ip_address loops_supported ram_usage cpu_usage");
         res.status(201).json({
             success: true,
             message: "Tạo tủ thành công",
@@ -104,9 +136,8 @@ const getAllPanels = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         else if (req.query.isRoot === "true") {
             // Lọc chỉ lấy tủ gốc (main_panel_id là null) nếu có query parameter isRoot=true
             query.main_panel_id = null;
-        }
-        // Lấy Panels và populate thông tin tủ cha
-        const panels = yield PanelModel_1.default.find(query).populate("main_panel_id", "name panel_type ip_address");
+        } // Lấy Panels và populate thông tin tủ cha
+        const panels = yield PanelModel_1.default.find(query).populate("main_panel_id", "name panel_type ip_address loops_supported ram_usage cpu_usage");
         res.status(200).json({
             success: true,
             count: panels.length,
@@ -142,7 +173,7 @@ const getPanelById = (req, res) => __awaiter(void 0, void 0, void 0, function* (
                 message: "Không tìm thấy tủ với ID " + req.params.id,
             });
         }
-        const panel = yield PanelModel_1.default.findById(req.params.id).populate("main_panel_id", "name panel_type ip_address");
+        const panel = yield PanelModel_1.default.findById(req.params.id).populate("main_panel_id", "name panel_type ip_address loops_supported ram_usage cpu_usage");
         if (!panel) {
             return res.status(404).json({
                 success: false,
@@ -159,8 +190,7 @@ const getPanelById = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         // Lỗi CastError đã được bắt ở kiểm tra isValid phía trên, lỗi khác là lỗi server
         res.status(500).json({
             success: false,
-            message: error.message ||
-                "Lỗi khi lấy thông tin tủ với ID " + req.params.id,
+            message: error.message || "Lỗi khi lấy thông tin tủ với ID " + req.params.id,
         });
     }
 });
@@ -181,8 +211,7 @@ const updatePanel = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         const updateData = Object.assign({}, req.body); // Sao chép body request để có thể sửa đổi
         // --- Logic mới để xử lý main_panel_id dựa trên panel_type và main_panel_ip ---
         // Nếu frontend gửi lên panel_type và nó KHÔNG phải là 'Control Panel' (tức là tủ địa chỉ/phụ)
-        if (updateData.panel_type &&
-            updateData.panel_type !== "Control Panel") {
+        if (updateData.panel_type && updateData.panel_type !== "Control Panel") {
             // Kiểm tra xem frontend có gửi kèm Địa chỉ IP của tủ trung tâm không
             if (!updateData.main_panel_ip) {
                 // Nếu là tủ địa chỉ/phụ mà không có IP tủ trung tâm, báo lỗi
@@ -233,12 +262,45 @@ const updatePanel = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         // Nếu panel_type không được gửi lên trong request, logic main_panel_id sẽ không bị thay đổi bởi đoạn code này
         // Nếu bạn muốn cho phép update panel_type mà không cần update main_panel_id cùng lúc (ví dụ: chỉ update tên), code hiện tại vẫn ổn.
         // Nếu bạn muốn cho phép update main_panel_id mà không cần update panel_type cùng lúc, bạn cần xem xét lại logic.
-        // Dựa trên modal, dường như panel_type và main_panel_id (hoặc main_panel_ip) luôn đi cùng nhau khi cài đặt chức năng này.
-        // --- Kết thúc Logic xử lý main_panel_id ---
+        // Dựa trên modal, dường như panel_type và main_panel_id (hoặc main_panel_ip) luôn đi cùng nhau khi cài đặt chức năng này.        // --- Kết thúc Logic xử lý main_panel_id ---
+        // --- Validation cho các trường mới ---
+        // Kiểm tra loops_supported
+        if (updateData.loops_supported !== undefined) {
+            if (typeof updateData.loops_supported !== "number" ||
+                updateData.loops_supported < 0) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Số lượng loops hỗ trợ phải là số không âm.",
+                });
+            }
+        }
+        // Kiểm tra ram_usage
+        if (updateData.ram_usage !== undefined) {
+            if (typeof updateData.ram_usage !== "number" ||
+                updateData.ram_usage < 0 ||
+                updateData.ram_usage > 100) {
+                return res.status(400).json({
+                    success: false,
+                    message: "RAM usage phải là số từ 0 đến 100%.",
+                });
+            }
+        }
+        // Kiểm tra cpu_usage
+        if (updateData.cpu_usage !== undefined) {
+            if (typeof updateData.cpu_usage !== "number" ||
+                updateData.cpu_usage < 0 ||
+                updateData.cpu_usage > 100) {
+                return res.status(400).json({
+                    success: false,
+                    message: "CPU usage phải là số từ 0 đến 100%.",
+                });
+            }
+        }
+        // --- Kết thúc validation cho các trường mới ---
         // Tiến hành cập nhật Panel bằng dữ liệu đã chuẩn bị (updateData)
         const updatedPanel = yield PanelModel_1.default.findByIdAndUpdate(panelIdToUpdate, updateData, // Sử dụng dữ liệu đã được điều chỉnh (có main_panel_id thay vì main_panel_ip nếu cần)
         { new: true, runValidators: true } // new: true trả về document sau khi cập nhật, runValidators: chạy validator trong schema
-        ).populate("main_panel_id", "name panel_type ip_address"); // Populate lại Panel cha sau khi update
+        ).populate("main_panel_id", "name panel_type ip_address loops_supported ram_usage cpu_usage"); // Populate lại Panel cha sau khi update
         // Kiểm tra xem Panel có tồn tại không sau khi tìm bằng ID params
         if (!updatedPanel) {
             return res.status(404).json({

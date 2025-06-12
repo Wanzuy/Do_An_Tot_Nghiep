@@ -20,7 +20,7 @@ const ZoneModel_1 = __importDefault(require("../models/ZoneModel"));
 const EventLogController_1 = require("./EventLogController");
 const createDetector = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        // Kiểm tra falcBoardId và zoneId có được cung cấp và hợp lệ không
+        // Kiểm tra falcBoardId có được cung cấp và hợp lệ không
         if (!req.body.falcBoardId ||
             !mongoose_1.default.Types.ObjectId.isValid(req.body.falcBoardId)) {
             return res.status(400).json({
@@ -28,58 +28,48 @@ const createDetector = (req, res) => __awaiter(void 0, void 0, void 0, function*
                 message: "FalcBoard ID không hợp lệ hoặc bị thiếu.",
             });
         }
-        if (!req.body.zoneId ||
-            !mongoose_1.default.Types.ObjectId.isValid(req.body.zoneId)) {
+        // Kiểm tra zoneId nếu được cung cấp
+        if (req.body.zoneId && !mongoose_1.default.Types.ObjectId.isValid(req.body.zoneId)) {
             return res.status(400).json({
                 success: false,
-                message: "Zone ID không hợp lệ hoặc bị thiếu.",
+                message: "Zone ID không hợp lệ.",
             });
         }
-        // Kiểm tra falcBoardId và zoneId có tồn tại không
+        // Kiểm tra falcBoardId có tồn tại không
         const falcBoard = yield FalcBoardModel_1.default.findById(req.body.falcBoardId);
         if (!falcBoard) {
             return res.status(404).json({
                 success: false,
-                message: "Không tìm thấy Bo mạch FALC với ID " +
-                    req.body.falcBoardId,
+                message: "Không tìm thấy Bo mạch FALC với ID " + req.body.falcBoardId,
             });
         }
-        const zone = yield ZoneModel_1.default.findById(req.body.zoneId);
-        if (!zone) {
-            return res.status(404).json({
-                success: false,
-                message: "Không tìm thấy Vùng (Zone) với ID " + req.body.zoneId,
-            });
-        }
-        // --- Bổ sung: Kiểm tra giới hạn của FalcBoard ---
-        const requestedLoop = req.body.loop_number;
+        // Kiểm tra zoneId có tồn tại không (nếu được cung cấp)
+        if (req.body.zoneId) {
+            const zone = yield ZoneModel_1.default.findById(req.body.zoneId);
+            if (!zone) {
+                return res.status(404).json({
+                    success: false,
+                    message: "Không tìm thấy Vùng (Zone) với ID " + req.body.zoneId,
+                });
+            }
+        } // --- Bổ sung: Kiểm tra giới hạn của FalcBoard ---
         const requestedAddress = req.body.detector_address;
-        const maxLoops = falcBoard.loop_count;
-        const maxDetectorsPerLoop = falcBoard.number_of_detectors; // Giới hạn thiết bị trên MỖI vòng
-        // 1. Kiểm tra loop_number có hợp lệ với số vòng lặp của bo mạch không
-        if (requestedLoop < 1 || requestedLoop > maxLoops) {
+        const maxDetectors = falcBoard.number_of_detectors; // Giới hạn thiết bị trên bo mạch
+        // 1. Kiểm tra detector_address có hợp lệ không (phải > 0)
+        if (requestedAddress < 1) {
             return res.status(400).json({
                 success: false,
-                message: `Số vòng lặp (${requestedLoop}) không hợp lệ cho bo mạch FALC "${falcBoard.name}". Số vòng lặp hợp lệ từ 1 đến ${maxLoops}.`,
+                message: `Địa chỉ đầu báo phải lớn hơn 0.`,
             });
         }
-        // 2. Kiểm tra detector_address có nằm trong giới hạn địa chỉ trên mỗi vòng lặp không
-        // Giả sử địa chỉ bắt đầu từ 1
-        if (requestedAddress < 1 || requestedAddress > maxDetectorsPerLoop) {
-            return res.status(400).json({
-                success: false,
-                message: `Địa chỉ đầu báo (${requestedAddress}) nằm ngoài giới hạn cho phép trên mỗi vòng lặp của bo mạch FALC "${falcBoard.name}". Địa chỉ hợp lệ từ 1 đến ${maxDetectorsPerLoop}.`,
-            });
-        }
-        // 3. Kiểm tra số lượng đầu báo hiện tại trên vòng lặp này để không vượt quá giới hạn
-        const existingDetectorsCountOnLoop = yield DetectorModel_1.default.countDocuments({
+        // 2. Kiểm tra số lượng đầu báo hiện tại trên bo mạch này để không vượt quá giới hạn
+        const existingDetectorsCount = yield DetectorModel_1.default.countDocuments({
             falcBoardId: req.body.falcBoardId,
-            loop_number: requestedLoop,
         });
-        if (existingDetectorsCountOnLoop >= maxDetectorsPerLoop) {
+        if (existingDetectorsCount >= maxDetectors) {
             return res.status(400).json({
                 success: false,
-                message: `Vòng lặp ${requestedLoop} của bo mạch FALC "${falcBoard.name}" đã đạt số lượng thiết bị tối đa (${maxDetectorsPerLoop}). Không thể thêm đầu báo mới vào vòng lặp này.`,
+                message: `Bo mạch FALC "${falcBoard.name}" đã đạt số lượng thiết bị tối đa (${maxDetectors}). Không thể thêm đầu báo mới vào bo mạch này.`,
             });
         }
         // --- Kết thúc kiểm tra giới hạn ---
@@ -111,11 +101,11 @@ const createDetector = (req, res) => __awaiter(void 0, void 0, void 0, function*
     }
     catch (error) {
         console.error("Lỗi khi tạo đầu báo:", error);
-        // Xử lý lỗi unique index kết hợp (falcBoardId + loop_number + detector_address)
+        // Xử lý lỗi unique constraint cho detector_address
         if (error.code === 11000) {
             res.status(400).json({
                 success: false,
-                message: "Địa chỉ đầu báo đã tồn tại trên vòng lặp này của bo mạch FALC.",
+                message: "Địa chỉ đầu báo đã tồn tại trong hệ thống.",
             });
         }
         else if (error.name === "ValidationError") {
@@ -146,7 +136,8 @@ exports.createDetector = createDetector;
  */
 const getAllDetectors = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const filter = {}; // Object chứa các điều kiện lọc
+        // Object chứa các điều kiện lọc
+        const filter = {};
         if (req.query.falcBoardId) {
             if (!mongoose_1.default.Types.ObjectId.isValid(req.query.falcBoardId)) {
                 return res.status(400).json({
@@ -156,8 +147,6 @@ const getAllDetectors = (req, res) => __awaiter(void 0, void 0, void 0, function
             }
             filter.falcBoardId = req.query.falcBoardId;
         }
-        if (req.query.loop_number !== undefined)
-            filter.loop_number = req.query.loop_number; // Cho phép lọc cả loop_number = 0
         if (req.query.zoneId) {
             if (!mongoose_1.default.Types.ObjectId.isValid(req.query.zoneId)) {
                 return res.status(400).json({
@@ -279,8 +268,7 @@ const updateDetector = (req, res) => __awaiter(void 0, void 0, void 0, function*
                 if (!falcBoard) {
                     return res.status(404).json({
                         success: false,
-                        message: "Không tìm thấy Bo mạch FALC với ID mới " +
-                            req.body.falcBoardId,
+                        message: "Không tìm thấy Bo mạch FALC với ID mới " + req.body.falcBoardId,
                     });
                 }
             }
@@ -300,8 +288,7 @@ const updateDetector = (req, res) => __awaiter(void 0, void 0, void 0, function*
                 if (!zone) {
                     return res.status(404).json({
                         success: false,
-                        message: "Không tìm thấy Vùng (Zone) với ID mới " +
-                            req.body.zoneId,
+                        message: "Không tìm thấy Vùng (Zone) với ID mới " + req.body.zoneId,
                     });
                 }
             }
@@ -324,11 +311,12 @@ const updateDetector = (req, res) => __awaiter(void 0, void 0, void 0, function*
         });
     }
     catch (error) {
-        console.error("Lỗi khi cập nhật thông tin đầu báo:", error); // Xử lý lỗi unique index kết hợp (falcBoardId + loop_number + detector_address)
+        console.error("Lỗi khi cập nhật thông tin đầu báo:", error);
+        // Xử lý lỗi unique constraint cho detector_address
         if (error.code === 11000) {
             res.status(400).json({
                 success: false,
-                message: "Địa chỉ đầu báo đã tồn tại trên vòng lặp này của bo mạch FALC.",
+                message: "Địa chỉ đầu báo đã tồn tại trong hệ thống.",
             });
         }
         else if (error.name === "ValidationError") {
@@ -347,8 +335,7 @@ const updateDetector = (req, res) => __awaiter(void 0, void 0, void 0, function*
             res.status(500).json({
                 success: false,
                 message: error.message ||
-                    "Lỗi khi cập nhật thông tin đầu báo với ID " +
-                        req.params.id,
+                    "Lỗi khi cập nhật thông tin đầu báo với ID " + req.params.id,
             });
         }
     }
@@ -383,8 +370,7 @@ const updateDetectorStatus = (req, res) => __awaiter(void 0, void 0, void 0, fun
                     validStatuses.join(", "),
             });
             return;
-        }
-        // Lấy thông tin đầu báo hiện tại để so sánh trạng thái cũ và lấy thông tin cho log
+        } // Lấy thông tin đầu báo hiện tại để so sánh trạng thái cũ và lấy thông tin cho log
         // Populate thêm zoneId để có tên zone cho log
         const detector = yield DetectorModel_1.default.findById(req.params.id)
             .populate({
@@ -393,7 +379,7 @@ const updateDetectorStatus = (req, res) => __awaiter(void 0, void 0, void 0, fun
                 path: "panelId",
                 select: "status",
             },
-            select: "panelId loop_number is_active",
+            select: "panelId is_active",
         })
             .populate("zoneId", "name");
         if (!detector) {
@@ -434,10 +420,7 @@ const updateDetectorStatus = (req, res) => __awaiter(void 0, void 0, void 0, fun
             const detectorAddress = updatedDetector.detector_address;
             const detectorName = updatedDetector.name;
             const detectorType = updatedDetector.detector_type;
-            const loopInfo = updatedDetector && updatedDetector.loop_number
-                ? `Vòng ${updatedDetector.loop_number}`
-                : "";
-            const fullDetectorInfo = `${detectorType} "${detectorName || detectorAddress}" (${loopInfo}, Địa chỉ: ${detectorAddress})`;
+            const fullDetectorInfo = `${detectorType} "${detectorName || detectorAddress}" (Địa chỉ: ${detectorAddress})`;
             const zoneName = updatedDetector.zoneId && updatedDetector.zoneId.name
                 ? ` tại khu vực(zone): "${updatedDetector.zoneId.name}"`
                 : "";
@@ -484,16 +467,13 @@ const updateDetectorStatus = (req, res) => __awaiter(void 0, void 0, void 0, fun
                 ? updatedDetector.falcBoardId.panelId
                 : null;
             // Xác định trạng thái log ('Active' cho Alarm/Fault, 'Info' cho Restore/Normal)
-            const logStatus = updatedDetector.status === "Alarm" ||
-                updatedDetector.status === "Fault"
+            const logStatus = updatedDetector.status === "Alarm" || updatedDetector.status === "Fault"
                 ? "Active"
                 : "Info";
             // Gọi hàm ghi log
             yield (0, EventLogController_1.createEventLog)(eventType, description, "Detector", // Loại nguồn
             updatedDetector._id, // ID nguồn
-            updatedDetector.zoneId
-                ? updatedDetector.zoneId._id
-                : null, // ID Zone
+            updatedDetector.zoneId ? updatedDetector.zoneId._id : null, // ID Zone
             panelId, // ID Panel
             logStatus, // Trạng thái log
             {
@@ -536,8 +516,7 @@ const updateDetectorStatus = (req, res) => __awaiter(void 0, void 0, void 0, fun
         res.status(500).json({
             success: false,
             message: error.message ||
-                "Đã xảy ra lỗi khi cập nhật trạng thái đầu báo với ID " +
-                    req.params.id,
+                "Đã xảy ra lỗi khi cập nhật trạng thái đầu báo với ID " + req.params.id,
         });
     }
 });
@@ -578,8 +557,7 @@ const deleteDetector = (req, res) => __awaiter(void 0, void 0, void 0, function*
         }
         res.status(500).json({
             success: false,
-            message: error.message ||
-                "Không thể xóa đầu báo với ID " + req.params.id,
+            message: error.message || "Không thể xóa đầu báo với ID " + req.params.id,
         });
     }
 });
@@ -602,7 +580,7 @@ const getDetectorsByFalcBoardId = (req, res) => __awaiter(void 0, void 0, void 0
             path: "falcBoardId",
             populate: { path: "panelId", select: "name panel_type" },
         })
-            .sort({ loop_number: 1, detector_address: 1 });
+            .sort({ detector_address: 1 }); // Sắp xếp theo địa chỉ đầu báo
         res.status(200).json({
             success: true,
             count: detectors.length,
