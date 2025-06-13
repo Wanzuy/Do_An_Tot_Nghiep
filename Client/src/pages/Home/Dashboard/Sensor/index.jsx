@@ -51,8 +51,12 @@ function Sensor({ detectorStats, loading }) {
         dataSource={loading ? [] : detectorStats?.faultyList || []}
         loading={loading}
         locale={{
-          emptyText:
-            t("Dashboard.noFaultyDetectors") || "Không có đầu báo nào bị lỗi",
+          emptyText: (
+            <p className="text-center text-white text-[1.6rem]">
+              {t("Dashboard.noFaultyDetectors") ||
+                "Không có đầu báo nào bị lỗi"}
+            </p>
+          ),
         }}
         renderItem={(item) => (
           <List.Item>

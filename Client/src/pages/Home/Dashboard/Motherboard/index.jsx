@@ -52,8 +52,11 @@ function Motherboard({ boardStats, loading }) {
         dataSource={loading ? [] : boardStats?.disabledList || []}
         loading={loading}
         locale={{
-          emptyText:
-            t("Dashboard.noDisabledBoards") || "Không có bo mạch nào bị tắt",
+          emptyText: (
+            <p className="text-center text-white text-[1.6rem]">
+              {t("Dashboard.noDisabledBoards") || "Không có bo mạch nào bị tắt"}
+            </p>
+          ),
         }}
         renderItem={(item) => (
           <List.Item>
