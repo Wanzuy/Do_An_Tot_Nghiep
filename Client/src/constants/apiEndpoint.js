@@ -45,6 +45,11 @@ export const apiEndpoint = {
     getDetectorsByZone: (zoneId) => `/detectors/zone/${zoneId}`,
     getDetectorsByFalc: (falcId) => `/detectors/falcboard/${falcId}`,
   },
+  eventlogs: {
+    getAllEventLogs: "/eventlogs",
+    getEventLogById: (eventLogId) => `/eventlogs/${eventLogId}`,
+    acknowledgeEventLog: (eventLogId) => `/eventlogs/${eventLogId}/acknowledge`,
+  },
   chatbot: {
     chat: "/api/chatbot/chat",
     suggestions: "/api/chatbot/suggestions",

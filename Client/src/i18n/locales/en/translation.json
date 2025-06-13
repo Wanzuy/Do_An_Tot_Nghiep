@@ -19,6 +19,25 @@
     "version": "Version:",
     "reserve": "© 2025 Tinventor Electronics - All rights reserved."
   },
+  "Dashboard": {
+    "newNotifications": "New Notifications",
+    "refreshNotifications": "Refresh notifications",
+    "noDescription": "No description",
+    "undefined": "Undefined",
+    "needsProcessing": "Needs processing",
+    "noIncidentsToProcess": "No incidents to process",
+    "systemOverview": "System Overview",
+    "refreshData": "Refresh data",
+    "quickActions": "Quick Actions",
+    "callSupport": "Call Support",
+    "configuration": "Configuration",
+    "report": "Report",
+    "refresh": "Refresh",
+    "statusStatistics": "Status Statistics",
+    "operating": "Operating",
+    "warning": "Warning",
+    "error": "Error"
+  },
   "FalcManagement": {
     "title": "FALC Module Management",
     "board": "Board",
@@ -191,20 +210,75 @@
     "invalidIPAddress": "Invalid IP Address",
     "loading": "Loading data...",
     "deleteAction": "This action cannot be undone.",
-    "active": "Active",
-    "inactive": "Inactive",
+    "toggle": "Toggle",
+    "active": "On",
+    "inactive": "Off",
     "normal": "Normal",
     "fault": "Fault",
     "offline": "Offline",
     "disabled": "Disabled",
     "status": "Status",
     "close": "Close",
-    "noDescription": "No description"
+    "noDescription": "No description",
+    "previous": "Previous",
+    "next": "Next",
+    "action": "Action",
+    "basicInfo": "Basic Information",
+    "locationInfo": "Location Information"
   },
   "detector": {
     "address": "Address",
     "name": "Name",
     "type": "Type",
     "zone": "Zone"
+  },
+  "IncidentManagement": {
+    "title": "Incident Management",
+    "timestamp": "Timestamp",
+    "eventType": "Event Type",
+    "description": "Description",
+    "zone": "Zone",
+    "status": "Status",
+    "actions": "Actions",
+    "details": "Event Details",
+    "sourceType": "Source Type",
+    "sourceId": "Source ID",
+    "detectorAddress": "Detector Address",
+    "panel": "Control Panel",
+    "acknowledgedAt": "Acknowledged At",
+    "acknowledgedBy": "Acknowledged By",
+    "noEvents": "No incidents found",
+    "loading": "Loading incidents...",
+    "loadError": "Error occurred while loading data",
+    "acknowledge": "Acknowledge",
+    "acknowledgeSuccess": "Incident acknowledged successfully",
+    "acknowledgeError": "Error occurred while acknowledging incident",
+    "viewDetails": "View Details",
+    "refresh": "Refresh",
+    "refreshMobile": "Reload",
+    "eventTypes": {
+      "Fire Alarm": "Fire Alarm",
+      "Fault": "Fault"
+    },
+    "statusTypes": {
+      "Active": "Active",
+      "Cleared": "Cleared"
+    },
+    "sourceTypes": {
+      "Detector": "Detector",
+      "NAC": "NAC Circuit",
+      "Panel": "Control Panel"
+    },
+    "filters": {
+      "type": "Filter by Event Type",
+      "status": "Filter by Status",
+      "allTypes": "All Event Types",
+      "allStatuses": "All Statuses",
+      "selectType": "Select Event Type",
+      "selectStatus": "Select Status"
+    },
+    "pagination": {
+      "total": "Total: {{total}} records"
+    }
   }
 }

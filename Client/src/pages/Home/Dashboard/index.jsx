@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import "./Dashboard.scss";
 import SystemStatusBanner from "./SystemStatusBanner";
 import { Col, Progress, Row, Spin } from "antd";
@@ -13,11 +14,17 @@ import handleAPI from "../../../api/handleAPI";
 import { apiEndpoint } from "../../../constants/apiEndpoint";
 
 function Dashboard() {
+  const { t } = useTranslation();
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [systemStats, setSystemStats] = useState({
     cpu_usage: 0,
     ram_usage: 0,
     loading: true,
+  });
+  const [eventLogs, setEventLogs] = useState({
+    data: [],
+    loading: true,
+    activeCount: 0,
   });
 
   useEffect(() => {
@@ -25,11 +32,14 @@ function Dashboard() {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
-
   useEffect(() => {
     fetchSystemStats();
+    fetchEventLogs();
     // Cập nhật dữ liệu mỗi 30 giây
-    const interval = setInterval(fetchSystemStats, 30000);
+    const interval = setInterval(() => {
+      fetchSystemStats();
+      fetchEventLogs();
+    }, 30000);
     return () => clearInterval(interval);
   }, []);
 
@@ -62,6 +72,38 @@ function Dashboard() {
         cpu_usage: 0,
         ram_usage: 0,
         loading: false,
+      });
+    }
+  };
+
+  const fetchEventLogs = async () => {
+    try {
+      setEventLogs((prev) => ({ ...prev, loading: true }));
+      const response = await handleAPI(apiEndpoint.eventlogs.getAllEventLogs);
+      if (response && response.data) {
+        // Lọc các sự cố có trạng thái Active (cần xử lý)
+        const activeEvents = response.data.filter(
+          (event) => event.status === "Active"
+        );
+
+        setEventLogs({
+          data: activeEvents.slice(0, 5), // Chỉ hiển thị 5 sự cố ACTIVE gần nhất
+          loading: false,
+          activeCount: activeEvents.length,
+        });
+      } else {
+        setEventLogs({
+          data: [],
+          loading: false,
+          activeCount: 0,
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching event logs:", error);
+      setEventLogs({
+        data: [],
+        loading: false,
+        activeCount: 0,
       });
     }
   };
@@ -99,36 +141,77 @@ function Dashboard() {
           {/* Cột thứ hai: Các khối thông tin */}
           <Col xs={24} md={6}>
             <div className="min-h-[80vh] bg-[#333333] rounded-lg shadow-lg border border-solid border-[#FFFFFF0D] p-4 flex flex-col gap-4">
+              {" "}
               {/* Block 1: Notifications */}
               <div className="bg-[#444444] rounded p-3 border border-solid border-[#FFFFFF0D]">
+                {" "}
                 <div className="flex items-center justify-between mb-2">
+                  {" "}
                   <div className="text-white font-medium text-3xl">
-                    Thông báo mới
+                    {t("Dashboard.newNotifications")}
                   </div>
-                  <div className="bg-[#e53935] text-white text-xl rounded-full w-10 h-10 flex items-center justify-center">
-                    5
+                  <div className="flex items-center gap-2">
+                    <div className="bg-[#e53935] text-white text-xl rounded-full w-10 h-10 flex items-center justify-center">
+                      {eventLogs.loading ? "..." : eventLogs.activeCount}
+                    </div>
+                    {eventLogs.loading ? (
+                      <Spin size="small" />
+                    ) : (
+                      <ReloadOutlined
+                        style={{ color: "#e53935", cursor: "pointer" }}
+                        onClick={fetchEventLogs}
+                        title={t("Dashboard.refreshNotifications")}
+                      />
+                    )}
                   </div>
                 </div>
                 <div className="mt-4 space-y-2">
-                  <div className="border-b border-[#FFFFFF0D] pb-2">
-                    <div className="text-[#ccc] text-[1.4rem]">
-                      Cảnh báo nhiệt độ cao
+                  {eventLogs.loading ? (
+                    <div className="flex justify-center py-4">
+                      <Spin size="small" />
                     </div>
-                    <div className="text-gray-400 text-lg">10 phút trước</div>
-                  </div>
-                  <div className="border-b border-[#FFFFFF0D] pb-2">
-                    <div className="text-[#ccc] text-xl">
-                      Mất kết nối FAC01_008
+                  ) : eventLogs.data.length > 0 ? (
+                    eventLogs.data.map((event, index) => (
+                      <div
+                        key={event._id || index}
+                        className="border-b border-[#FFFFFF0D] pb-2"
+                      >
+                        <div className="text-[#ccc] text-[1.4rem] truncate">
+                          {event.description || t("Dashboard.noDescription")}
+                        </div>{" "}
+                        <div className="flex justify-between items-center">
+                          <div className="text-gray-400 text-lg">
+                            {event.timestamp
+                              ? new Date(event.timestamp).toLocaleString(
+                                  "vi-VN",
+                                  {
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                    day: "2-digit",
+                                    month: "2-digit",
+                                  }
+                                )
+                              : t("Dashboard.undefined")}
+                          </div>
+                          <div className="px-2 py-1 rounded text-xs bg-red-600 text-white">
+                            {t("Dashboard.needsProcessing")}
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-gray-400 text-center py-4">
+                      {t("Dashboard.noIncidentsToProcess")}
                     </div>
-                    <div className="text-gray-400 text-lg">25 phút trước</div>
-                  </div>
+                  )}
                 </div>
               </div>{" "}
               {/* Block 2: System Overview */}
               <div className="bg-[#444444] rounded p-3 border border-solid border-[#FFFFFF0D]">
                 <div className="flex items-center justify-between mb-2">
+                  {" "}
                   <div className="text-white font-medium text-3xl">
-                    Tổng quan hệ thống
+                    {t("Dashboard.systemOverview")}
                   </div>
                   <div className="flex items-center gap-2">
                     {systemStats.loading ? (
@@ -137,7 +220,7 @@ function Dashboard() {
                       <ReloadOutlined
                         style={{ color: "#e53935", cursor: "pointer" }}
                         onClick={fetchSystemStats}
-                        title="Làm mới dữ liệu"
+                        title={t("Dashboard.refreshData")}
                       />
                     )}
                     <SettingOutlined style={{ color: "#e53935" }} />
@@ -190,66 +273,87 @@ function Dashboard() {
               {/* Block 3: Quick Actions */}
               <div className="bg-[#444444] rounded p-3 border border-solid border-[#FFFFFF0D]">
                 <div className="flex items-center justify-between mb-3">
+                  {" "}
                   <div className="text-white font-medium text-3xl">
-                    Thao tác nhanh
+                    {t("Dashboard.quickActions")}
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   <button className="bg-[#555555] hover:bg-[#666666] text-white p-2 rounded transition flex flex-col items-center">
                     <PhoneOutlined style={{ fontSize: "18px" }} />
-                    <span className="text-xl mt-1">Gọi hỗ trợ</span>
+                    <span className="text-xl mt-1">
+                      {t("Dashboard.callSupport")}
+                    </span>
                   </button>
                   <button className="bg-[#555555] hover:bg-[#666666] text-white p-2 rounded transition flex flex-col items-center">
                     <SettingOutlined style={{ fontSize: "18px" }} />
-                    <span className="text-xl mt-1">Cấu hình</span>
-                  </button>
+                    <span className="text-xl mt-1">
+                      {t("Dashboard.configuration")}
+                    </span>
+                  </button>{" "}
                   <button className="bg-[#555555] hover:bg-[#666666] text-white p-2 rounded transition flex flex-col items-center">
                     <span className="text-xl">⚠️</span>
-                    <span className="text-xl mt-1">Báo cáo</span>
-                  </button>{" "}
+                    <span className="text-xl mt-1">
+                      {t("Dashboard.report")}
+                    </span>
+                  </button>
                   <button
                     className="bg-[#555555] hover:bg-[#666666] text-white p-2 rounded transition flex flex-col items-center"
-                    onClick={fetchSystemStats}
-                    disabled={systemStats.loading}
+                    onClick={() => {
+                      fetchSystemStats();
+                      fetchEventLogs();
+                    }}
+                    disabled={systemStats.loading || eventLogs.loading}
                   >
                     <span className="text-xl">🔄</span>
-                    <span className="text-xl mt-1">Làm mới</span>
+                    <span className="text-xl mt-1">
+                      {t("Dashboard.refresh")}
+                    </span>
                   </button>
                 </div>
               </div>
               {/* Block 4: Status Statistics */}
               <div className="bg-[#444444] rounded p-3 border border-solid border-[#FFFFFF0D] flex-grow">
+                {" "}
                 <div className="flex items-center justify-between mb-3">
                   <div className="text-white font-medium text-3xl">
-                    Thống kê trạng thái
+                    {t("Dashboard.statusStatistics")}
                   </div>
                 </div>
                 <div className="flex flex-col gap-3">
                   <div className="flex justify-between items-center">
                     <div className="flex items-center">
                       <div className="w-3 h-3 rounded-full bg-green-500 mr-2"></div>
-                      <span className="text-gray-300">Hoạt động</span>
+                      <span className="text-gray-300">
+                        {t("Dashboard.operating")}
+                      </span>
                     </div>
                     <span className="text-white">231</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <div className="flex items-center">
                       <div className="w-3 h-3 rounded-full bg-yellow-500 mr-2"></div>
-                      <span className="text-gray-300">Cảnh báo</span>
+                      <span className="text-gray-300">
+                        {t("Dashboard.warning")}
+                      </span>
                     </div>
                     <span className="text-white">45</span>
-                  </div>
+                  </div>{" "}
                   <div className="flex justify-between items-center">
                     <div className="flex items-center">
                       <div className="w-3 h-3 rounded-full bg-red-500 mr-2"></div>
-                      <span className="text-gray-300">Lỗi</span>
+                      <span className="text-gray-300">
+                        {t("Dashboard.error")}
+                      </span>
                     </div>
                     <span className="text-white">18</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <div className="flex items-center">
                       <div className="w-3 h-3 rounded-full bg-gray-500 mr-2"></div>
-                      <span className="text-gray-300">Không xác định</span>
+                      <span className="text-gray-300">
+                        {t("Dashboard.undefined")}
+                      </span>
                     </div>
                     <span className="text-white">7</span>
                   </div>

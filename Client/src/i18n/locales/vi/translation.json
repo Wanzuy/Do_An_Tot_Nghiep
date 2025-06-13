@@ -19,6 +19,25 @@
     "version": "Phiên bản:",
     "reserve": "© 2025 Tinventor Electronics - Tất cả các quyền được bảo lưu."
   },
+  "Dashboard": {
+    "newNotifications": "Thông báo mới",
+    "refreshNotifications": "Làm mới thông báo",
+    "noDescription": "Không có mô tả",
+    "undefined": "Không xác định",
+    "needsProcessing": "Cần xử lý",
+    "noIncidentsToProcess": "Không có sự cố cần xử lý",
+    "systemOverview": "Tổng quan hệ thống",
+    "refreshData": "Làm mới dữ liệu",
+    "quickActions": "Thao tác nhanh",
+    "callSupport": "Gọi hỗ trợ",
+    "configuration": "Cấu hình",
+    "report": "Báo cáo",
+    "refresh": "Làm mới",
+    "statusStatistics": "Thống kê trạng thái",
+    "operating": "Hoạt động",
+    "warning": "Cảnh báo",
+    "error": "Lỗi"
+  },
   "FalcManagement": {
     "title": "Quản lý module FALC",
     "board": "Bo mạch",
@@ -192,19 +211,74 @@
     "loading": "Đang tải dữ liệu...",
     "deleteAction": "Hành động này không thể hoàn tác.",
     "close": "Đóng",
-    "active": "Hoạt động",
-    "inactive": "Không hoạt động",
+    "toggle": "Hành động",
+    "active": "Bật",
+    "inactive": "Tắt",
     "normal": "Bình thường",
     "fault": "Lỗi",
     "offline": "Ngoại tuyến",
     "disabled": "Vô hiệu hóa",
     "status": "Trạng thái",
-    "noDescription": "Chưa có mô tả"
+    "noDescription": "Chưa có mô tả",
+    "previous": "Trước",
+    "next": "Tiếp",
+    "action": "Hành động",
+    "basicInfo": "Thông tin cơ bản",
+    "locationInfo": "Thông tin vị trí"
   },
   "detector": {
     "address": "Địa chỉ",
     "name": "Tên đầu báo",
     "type": "Loại",
     "zone": "Khu vực"
+  },
+  "IncidentManagement": {
+    "title": "Quản lý sự cố",
+    "timestamp": "Thời gian",
+    "eventType": "Loại sự cố",
+    "description": "Mô tả",
+    "zone": "Khu vực",
+    "status": "Trạng thái",
+    "actions": "Hành động",
+    "details": "Chi tiết sự cố",
+    "sourceType": "Loại nguồn sự cố",
+    "sourceId": "ID nguồn",
+    "detectorAddress": "Địa chỉ đầu báo",
+    "panel": "Tủ điều khiển",
+    "acknowledgedAt": "Thời gian xác nhận",
+    "acknowledgedBy": "Người xác nhận",
+    "noEvents": "Không có sự cố nào",
+    "loading": "Đang tải danh sách sự cố...",
+    "loadError": "Có lỗi xảy ra khi tải dữ liệu",
+    "acknowledge": "Xác nhận",
+    "acknowledgeSuccess": "Đã xác nhận sự cố thành công",
+    "acknowledgeError": "Có lỗi xảy ra khi xác nhận sự cố",
+    "viewDetails": "Xem chi tiết",
+    "refresh": "Làm mới",
+    "refreshMobile": "Tải lại",
+    "eventTypes": {
+      "Fire Alarm": "Báo động",
+      "Fault": "Lỗi"
+    },
+    "statusTypes": {
+      "Active": "Cần xử lý",
+      "Cleared": "Đã xử lý"
+    },
+    "sourceTypes": {
+      "Detector": "Đầu báo",
+      "NAC": "Mạch báo động",
+      "Panel": "Tủ điều khiển"
+    },
+    "filters": {
+      "type": "Lọc theo loại sự cố",
+      "status": "Lọc theo trạng thái",
+      "allTypes": "Tất cả loại sự cố",
+      "allStatuses": "Tất cả trạng thái",
+      "selectType": "Chọn loại sự cố",
+      "selectStatus": "Chọn trạng thái"
+    },
+    "pagination": {
+      "total": "Tổng cộng: {{total}} bản ghi"
+    }
   }
 }

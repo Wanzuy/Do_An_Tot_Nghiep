@@ -1,0 +1,502 @@
+// Styles for Incident Management Table
+.incident-table-card {
+  // Mobile responsive overflow handling
+  @media (max-width: 768px) {
+    overflow-x: auto;
+    padding: 0;
+
+    .ant-card-body {
+      padding: 8px;
+    }
+  }
+
+  .ant-table {
+    background: transparent;
+
+    // Mobile table wrapper
+    .ant-table-container {
+      overflow-x: auto;
+
+      @media (max-width: 768px) {
+        overflow-x: scroll;
+        -webkit-overflow-scrolling: touch;
+      }
+    }
+
+    .ant-table-thead > tr > th {
+      background: rgba(255, 255, 255, 0.1);
+      color: white !important;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 12px 16px;
+      font-weight: 600;
+      font-size: 1.4rem;
+      white-space: nowrap;
+
+      @media (max-width: 768px) {
+        padding: 8px 12px;
+        font-size: 1.2rem;
+      }
+      &::before {
+        display: none;
+      }
+    }
+
+    .ant-table-tbody > tr {
+      background: rgba(255, 255, 255, 0.05) !important;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+      &:hover {
+        background: rgba(
+          24,
+          144,
+          255,
+          0.2
+        ) !important; // Màu xanh nhạt khi hover
+
+        > td {
+          color: white !important;
+          background: transparent !important;
+        }
+
+        .ant-badge-status-text {
+          color: white !important;
+        }
+
+        .ant-tag {
+          color: white !important;
+        }
+      }
+
+      > td {
+        color: white !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 12px 16px;
+        font-size: 1.3rem;
+        background: transparent !important;
+
+        @media (max-width: 768px) {
+          padding: 8px 12px;
+          font-size: 1.2rem;
+        }
+      }
+    }
+
+    .ant-table-cell {
+      color: white !important;
+    }
+
+    .ant-empty {
+      color: white;
+
+      .ant-empty-description {
+        color: rgba(255, 255, 255, 0.7);
+      }
+    }
+  }
+  // Pagination styling
+  .ant-pagination {
+    @media (max-width: 768px) {
+      .ant-pagination-options {
+        display: none !important;
+      }
+
+      .ant-pagination-total-text {
+        display: none !important;
+      }
+
+      text-align: center;
+      margin-top: 16px;
+    }
+
+    .ant-pagination-item {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+
+      a {
+        color: white;
+      }
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: rgba(255, 255, 255, 0.3);
+      }
+
+      &.ant-pagination-item-active {
+        background: #1890ff;
+        border-color: #1890ff;
+
+        a {
+          color: white;
+        }
+      }
+    }
+
+    .ant-pagination-prev,
+    .ant-pagination-next {
+      color: white;
+
+      &:hover {
+        color: #1890ff;
+      }
+
+      &.ant-pagination-disabled {
+        color: rgba(255, 255, 255, 0.3);
+      }
+    }
+
+    .ant-pagination-options {
+      .ant-select {
+        .ant-select-selector {
+          background: rgba(255, 255, 255, 0.1);
+          border-color: rgba(255, 255, 255, 0.2);
+          color: white;
+        }
+
+        .ant-select-arrow {
+          color: white;
+        }
+      }
+    }
+
+    .ant-pagination-total-text {
+      color: white;
+    }
+  }
+}
+
+.custom-incident-table {
+  .ant-table {
+    font-size: 1.4rem;
+
+    @media (max-width: 768px) {
+      font-size: 1.2rem;
+    }
+  }
+
+  .ant-table-thead > tr > th {
+    font-size: 1.6rem;
+
+    @media (max-width: 768px) {
+      font-size: 1.3rem;
+    }
+  }
+
+  .ant-table-tbody > tr > td {
+    font-size: 1.4rem;
+
+    @media (max-width: 768px) {
+      font-size: 1.2rem;
+    }
+
+    // Responsive buttons in action column
+    .ant-space {
+      width: 100% !important;
+
+      .ant-btn {
+        @media (max-width: 768px) {
+          font-size: 1.1rem;
+          padding: 2px 8px;
+          height: auto;
+          line-height: 1.3;
+
+          .anticon {
+            font-size: 1.1rem;
+          }
+
+          span {
+            margin-left: 4px !important;
+          }
+        }
+      }
+    }
+  }
+
+  // Ensure badges and tags stay visible and responsive
+  .ant-badge {
+    @media (max-width: 768px) {
+      .ant-badge-status-text {
+        font-size: 1.1rem;
+      }
+    }
+
+    .ant-badge-status-text {
+      color: white !important;
+    }
+  }
+
+  .ant-tag {
+    color: white !important;
+
+    @media (max-width: 768px) {
+      font-size: 1.1rem;
+      padding: 2px 8px;
+    }
+  }
+}
+
+// Styles for Filter Select Components - Use specific class names
+.filter-select {
+  .ant-select-selector {
+    background: rgba(67, 67, 67, 0.8) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    color: white !important;
+    height: 40px !important;
+
+    @media (max-width: 768px) {
+      height: 36px !important;
+    }
+
+    .ant-select-selection-placeholder {
+      color: rgba(255, 255, 255, 0.7) !important;
+      line-height: 38px !important;
+
+      @media (max-width: 768px) {
+        line-height: 34px !important;
+        font-size: 1.3rem !important;
+      }
+    }
+
+    .ant-select-selection-item {
+      color: white !important;
+      line-height: 38px !important;
+
+      @media (max-width: 768px) {
+        line-height: 34px !important;
+        font-size: 1.3rem !important;
+      }
+    }
+  }
+
+  .ant-select-arrow {
+    color: white !important;
+  }
+
+  &:hover .ant-select-selector {
+    border-color: #1890ff !important;
+    background: rgba(67, 67, 67, 0.9) !important;
+  }
+
+  &.ant-select-focused .ant-select-selector {
+    border-color: #1890ff !important;
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2) !important;
+    background: rgba(67, 67, 67, 0.9) !important;
+  }
+
+  &.ant-select-open .ant-select-selector {
+    border-color: #1890ff !important;
+    background: rgba(67, 67, 67, 0.9) !important;
+  }
+
+  // Clear button styling
+  .ant-select-clear {
+    background: rgba(255, 255, 255, 0.2) !important;
+    color: white !important;
+    right: 25px !important;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.3) !important;
+    }
+  }
+}
+
+// Global dropdown styling for Select options
+.ant-select-dropdown {
+  background: #2c2c2c !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+  min-width: 200px !important;
+
+  .ant-select-item {
+    color: white !important;
+    background: transparent !important;
+    padding: 10px 16px !important;
+    text-align: center !important;
+    min-height: 40px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 1.4rem !important;
+    font-weight: 500 !important;
+    border-radius: 4px !important;
+    margin: 2px 4px !important;
+
+    &:hover {
+      background: rgba(24, 144, 255, 0.2) !important;
+      color: white !important;
+    }
+
+    &.ant-select-item-option-selected {
+      background: #1890ff !important;
+      color: white !important;
+      font-weight: 600 !important;
+    }
+
+    &.ant-select-item-option-active {
+      background: rgba(24, 144, 255, 0.3) !important;
+      color: white !important;
+    }
+  }
+
+  .ant-empty {
+    color: rgba(255, 255, 255, 0.7) !important;
+  }
+}
+
+// Specific styling for filter dropdowns
+.filter-select {
+  .ant-select-dropdown {
+    .ant-select-item {
+      &:first-child {
+        font-weight: 600 !important;
+        background: rgba(255, 255, 255, 0.05) !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+        margin-bottom: 4px !important;
+      }
+    }
+  }
+}
+
+// Mobile responsive for dropdowns
+@media (max-width: 768px) {
+  .ant-select-dropdown {
+    min-width: 180px !important;
+
+    .ant-select-item {
+      padding: 8px 12px !important;
+      min-height: 36px !important;
+      font-size: 1.3rem !important;
+    }
+  }
+}
+
+// Button hover fixes
+.bg-green-500:hover {
+  background-color: #10b981 !important;
+}
+
+.bg-blue-500:hover {
+  background-color: #3b82f6 !important;
+}
+
+.bg-blue-600:hover {
+  background-color: #2563eb !important;
+}
+
+// Badge text color fixes
+.ant-badge-status-text {
+  color: white !important;
+}
+
+// Tag color fixes for better contrast
+.ant-tag {
+  border: none;
+  font-weight: 500;
+}
+
+// Additional overrides for table
+.incident-table-card {
+  .ant-table-tbody {
+    .ant-table-row:hover {
+      .ant-table-cell {
+        background: rgba(24, 144, 255, 0.2) !important;
+      }
+    }
+  }
+}
+
+// Force white text in all table cells and mobile optimizations
+.custom-incident-table {
+  .ant-table-tbody {
+    .ant-table-cell {
+      color: white !important;
+
+      &:hover {
+        color: white !important;
+      }
+    }
+  }
+
+  // Ensure badges and tags stay visible
+  .ant-badge {
+    .ant-badge-status-text {
+      color: white !important;
+    }
+  }
+
+  .ant-tag {
+    color: white !important;
+  }
+}
+
+// Mobile specific improvements
+@media (max-width: 768px) {
+  // Main container responsive - Use data attribute or specific class
+  .incident-management-container {
+    padding: 16px !important;
+  }
+
+  // Header responsive - Use specific class
+  .incident-header {
+    background: #434343 !important;
+    padding: 16px !important;
+    border-radius: 8px !important;
+    margin-bottom: 16px !important;
+
+    h1 {
+      font-size: 1.8rem !important;
+    }
+  }
+
+  // Filter card responsive
+  .filter-card {
+    margin-bottom: 16px !important;
+
+    .ant-card-body {
+      padding: 16px !important;
+    }
+
+    .filter-grid {
+      gap: 12px !important;
+    }
+
+    label {
+      font-size: 1.3rem !important;
+      margin-bottom: 8px !important;
+    }
+  }
+
+  // Table card responsive
+  .incident-table-card {
+    .ant-card-body {
+      padding: 8px !important;
+    }
+  }
+}
+
+// Tablet responsive
+@media (min-width: 769px) and (max-width: 1024px) {
+  .custom-incident-table {
+    .ant-table-tbody > tr > td {
+      padding: 10px 14px;
+      font-size: 1.3rem;
+    }
+
+    .ant-table-thead > tr > th {
+      padding: 10px 14px;
+      font-size: 1.5rem;
+    }
+  }
+}
+
+// Ensure table is always scrollable on small screens
+@media (max-width: 1200px) {
+  .custom-incident-table {
+    .ant-table-container {
+      overflow-x: auto !important;
+    }
+
+    .ant-table-body {
+      overflow-x: auto !important;
+    }
+  }
+}

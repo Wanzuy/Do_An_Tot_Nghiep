@@ -225,7 +225,7 @@ function FalcDetailModal({ visible, onCancel, falcDevice, t, onConfigure }) {
                 {getStatusTag(displayDevice?.status)}
               </Descriptions.Item>
 
-              <Descriptions.Item label={t?.("common.active") || "Hoạt động"}>
+              <Descriptions.Item label={t?.("common.toggle")}>
                 {getActiveTag(displayDevice?.is_active)}
               </Descriptions.Item>
 
