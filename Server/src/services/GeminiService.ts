@@ -266,7 +266,7 @@ export const generateFireSafetyResponse = async (
         : "- Chưa có cài đặt âm lượng nào"
     }
 
-    **Nhật ký sự cố hiện có:**
+    **Nhật ký, thống kê, ghi nhận sự cố hiện có:**
     **LƯU Ý QUAN TRỌNG: "Sự cố" và "Sự kiện" trong hệ thống này là CÙNG MỘT KHÁI NIỆM, đều là các bản ghi trong EventLog. Khi người dùng hỏi về "sự cố" hoặc "sự kiện", hãy đếm và thống kê TOÀN BỘ các bản ghi EventLog, không phân biệt loại.**
     ${
       systemData.incidentLogs.length > 0
