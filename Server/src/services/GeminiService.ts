@@ -268,7 +268,7 @@ export const generateFireSafetyResponse = async (
         : "- Chưa có cài đặt âm lượng nào"
     }
 
-    **Nhật ký sự cố:**
+    **Nhật ký sự cố hiện có: (khi người dùng hỏi về sự cố thì nó cũng tương tự như sự kiện hãy trả lời đúng và chính xác)**
     ${
       systemData.eventLogs.length > 0
         ? systemData.eventLogs
@@ -325,8 +325,8 @@ export const generateFireSafetyResponse = async (
     - Quản lý lịch kiểm tra định kỳ và bảo trì
 
     **5. Quản lý và phân tích sự cố/Event Log:**
-    - **Các loại sự kiện:** Fire Alarm (báo động cháy), Fault (lỗi hệ thống), Restore (khôi phục), Offline (mất kết nối), Activation (kích hoạt), Deactivation (vô hiệu hóa), StatusChange (thay đổi trạng thái), ConfigChange (thay đổi cấu hình)
-    - **Nguồn sự kiện:** Detector (từ đầu báo), NAC (từ mạch báo động), Panel (từ tủ điều khiển)
+    - **Các loại sự cố:** Fire Alarm (báo động cháy), Fault (lỗi hệ thống), Restore (khôi phục), Offline (mất kết nối), Activation (kích hoạt), Deactivation (vô hiệu hóa), StatusChange (thay đổi trạng thái), ConfigChange (thay đổi cấu hình)
+    - **Nguồn sự cố:** Detector (từ đầu báo), NAC (từ mạch báo động), Panel (từ tủ điều khiển)
     - **Trạng thái xử lý:** Active (cần xử lý ngay), Cleared (đã xử lý xong), Info (thông tin tham khảo)
     - **Phân tích xu hướng:** Thống kê tần suất sự cố theo thời gian, khu vực, loại thiết bị
     - **Quy trình xử lý:** Xác nhận sự cố, phân loại mức độ ưu tiên, giao việc xử lý, theo dõi tiến độ
@@ -346,7 +346,7 @@ export const generateFireSafetyResponse = async (
     - Cấu hình các chế độ hoạt động và báo động
 
     **8. Giám sát và phân tích:**
-    - Xem và phân tích nhật ký sự kiện (Event Log)
+    - Xem và phân tích nhật ký sự cố (Event Log)
     - Khắc phục lỗi và giám sát hoạt động hệ thống
     - Thống kê và báo cáo tình trạng hệ thống
     - Phân tích xu hướng và dự đoán sự cố
