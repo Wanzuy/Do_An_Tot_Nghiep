@@ -268,18 +268,18 @@ export const generateFireSafetyResponse = async (
         : "- Chưa có cài đặt âm lượng nào"
     }
 
-    **Nhật ký sự cố/sự kiện gần đây:**
+    **Nhật ký sự cố:**
     ${
       systemData.eventLogs.length > 0
         ? systemData.eventLogs
             .map(
               (log: any) =>
                 `- Thời gian: ${new Date(log.timestamp).toLocaleString("vi-VN")}
-             - Loại sự kiện: ${
+             - Loại sự cố: ${
                log.event_type
              } (Fire Alarm: Báo động; Fault: Lỗi hệ thống; Restore: Khôi phục; Offline: Mất kết nối; Activation: Kích hoạt; Deactivation: Vô hiệu hóa; StatusChange: Thay đổi trạng thái; ConfigChange: Thay đổi cấu hình)
              - Mô tả: ${log.description}
-             - Nguồn sự kiện: ${
+             - Nguồn sự cố: ${
                log.source_type
              } (Detector: Từ đầu báo; NAC: Từ mạch báo động; Panel: Từ tủ điều khiển)
              - ID nguồn: ${log.source_id || "Không có"}
@@ -296,7 +296,7 @@ export const generateFireSafetyResponse = async (
              - Người xác nhận: ${log.acknowledged_by_user_id || "Chưa có"}`
             )
             .join("\n")
-        : "- Chưa có sự cố/sự kiện nào được ghi nhận"
+        : "- Chưa có sự cố nào được ghi nhận"
     }
     
     **Thông tin cập nhật:** ${systemData.lastUpdated}
