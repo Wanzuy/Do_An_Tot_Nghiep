@@ -37,6 +37,25 @@ export const apiEndpoint = {
     updateStatus: (falcId) => `/falcboards/${falcId}/status`,
     update: (falcId) => `/falcboards/${falcId}`,
   },
+  nac: {
+    getAll: "/nacboards",
+    getById: (nacId) => `/nacboards/${nacId}`,
+    updateStatus: (nacId) => `/nacboards/${nacId}/status`,
+    update: (nacId) => `/nacboards/${nacId}`,
+    getWithCircuits: "/nacboards/with-circuits",
+  },
+  nacCircuits: {
+    getAll: "/naccircuits",
+    getById: (circuitId) => `/naccircuits/${circuitId}`,
+    getByNacBoard: (nacBoardId) =>
+      `/naccircuits/nacboards/${nacBoardId}/circuits`,
+    getByZone: (zoneId) => `/naccircuits/zone/${zoneId}`,
+    create: "/naccircuits",
+    update: (circuitId) => `/naccircuits/${circuitId}`,
+    delete: (circuitId) => `/naccircuits/${circuitId}`,
+    activate: (circuitId) => `/naccircuits/${circuitId}/activate`,
+    deactivate: (circuitId) => `/naccircuits/${circuitId}/deactivate`,
+  },
   detectors: {
     getAllDetectors: "/detectors",
     getDetectorById: (detectorId) => `/detectors/${detectorId}`,
@@ -55,5 +74,11 @@ export const apiEndpoint = {
     suggestions: "/api/chatbot/suggestions",
     history: "/api/chatbot/history",
     clearHistory: "/api/chatbot/history",
+  },
+  statistics: {
+    dashboard: "/statistics/dashboard",
+    detectors: "/statistics/detectors",
+    boards: "/statistics/boards",
+    system: "/statistics/system",
   },
 };

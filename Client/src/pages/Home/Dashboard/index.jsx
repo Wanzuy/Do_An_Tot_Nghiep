@@ -12,10 +12,19 @@ import Motherboard from "./Motherboard";
 import Sensor from "./Sensor";
 import handleAPI from "../../../api/handleAPI";
 import { apiEndpoint } from "../../../constants/apiEndpoint";
+import { Link } from "react-router-dom";
 
 function Dashboard() {
   const { t } = useTranslation();
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  const [dashboardData, setDashboardData] = useState({
+    detectors: { total: 0, disconnected: 0, normal: 0, faultyList: [] },
+    boards: { total: 0, disconnected: 0, faultyList: [] },
+    events: { active: 0, total: 0 },
+    statusStats: { operating: 0, warning: 0, error: 0, undefined: 0 },
+    systemStatus: { hasError: false, message: "" },
+    loading: true,
+  });
   const [systemStats, setSystemStats] = useState({
     cpu_usage: 0,
     ram_usage: 0,
@@ -33,15 +42,35 @@ function Dashboard() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
   useEffect(() => {
+    fetchDashboardData();
     fetchSystemStats();
     fetchEventLogs();
-    // Cập nhật dữ liệu mỗi 30 giây
+    // Cập nhật dữ liệu mỗi 2 phút
     const interval = setInterval(() => {
+      fetchDashboardData();
       fetchSystemStats();
       fetchEventLogs();
-    }, 30000);
+    }, 120000);
     return () => clearInterval(interval);
   }, []);
+  const fetchDashboardData = async () => {
+    try {
+      setDashboardData((prev) => ({ ...prev, loading: true }));
+      const response = await handleAPI(apiEndpoint.statistics.dashboard);
+
+      if (response && response.data) {
+        setDashboardData({
+          ...response.data,
+          loading: false,
+        });
+      } else {
+        setDashboardData((prev) => ({ ...prev, loading: false }));
+      }
+    } catch (error) {
+      console.error("Error fetching dashboard data:", error);
+      setDashboardData((prev) => ({ ...prev, loading: false }));
+    }
+  };
 
   const fetchSystemStats = async () => {
     try {
@@ -116,10 +145,9 @@ function Dashboard() {
 
   // Gutter sẽ là [16, 16] khi màn hình >= 1024px, ngược lại là [0, 0]
   const gutterSize = windowWidth >= 1024 ? [16, 16] : [0, 16];
-
   return (
     <>
-      <SystemStatusBanner />
+      <SystemStatusBanner systemStatus={dashboardData.systemStatus} />
       <div className="px-4 lg:px-[5rem] py-8">
         <Row gutter={[0, 16]} className="flex items-stretch">
           {/* Cột đầu tiên: Bo mạch và Đầu báo */}
@@ -127,12 +155,18 @@ function Dashboard() {
             <Row gutter={gutterSize} className="flex items-stretch w-full">
               <Col xs={24} md={12} className="flex">
                 <div className="w-full">
-                  <Motherboard />
+                  <Motherboard
+                    boardStats={dashboardData.boards}
+                    loading={dashboardData.loading}
+                  />
                 </div>
               </Col>
               <Col xs={24} md={12} className="flex">
                 <div className="w-full">
-                  <Sensor />
+                  <Sensor
+                    detectorStats={dashboardData.detectors}
+                    loading={dashboardData.loading}
+                  />
                 </div>
               </Col>
             </Row>
@@ -287,23 +321,28 @@ function Dashboard() {
                   </button>
                   <button className="bg-[#555555] hover:bg-[#666666] text-white p-2 rounded transition flex flex-col items-center">
                     <SettingOutlined style={{ fontSize: "18px" }} />
-                    <span className="text-xl mt-1">
+                    <Link to="/cai-dat" className="text-xl mt-1">
                       {t("Dashboard.configuration")}
-                    </span>
+                    </Link>
                   </button>{" "}
                   <button className="bg-[#555555] hover:bg-[#666666] text-white p-2 rounded transition flex flex-col items-center">
                     <span className="text-xl">⚠️</span>
                     <span className="text-xl mt-1">
                       {t("Dashboard.report")}
                     </span>
-                  </button>
+                  </button>{" "}
                   <button
                     className="bg-[#555555] hover:bg-[#666666] text-white p-2 rounded transition flex flex-col items-center"
                     onClick={() => {
+                      fetchDashboardData();
                       fetchSystemStats();
                       fetchEventLogs();
                     }}
-                    disabled={systemStats.loading || eventLogs.loading}
+                    disabled={
+                      dashboardData.loading ||
+                      systemStats.loading ||
+                      eventLogs.loading
+                    }
                   >
                     <span className="text-xl">🔄</span>
                     <span className="text-xl mt-1">
@@ -319,7 +358,7 @@ function Dashboard() {
                   <div className="text-white font-medium text-3xl">
                     {t("Dashboard.statusStatistics")}
                   </div>
-                </div>
+                </div>{" "}
                 <div className="flex flex-col gap-3">
                   <div className="flex justify-between items-center">
                     <div className="flex items-center">
@@ -327,8 +366,12 @@ function Dashboard() {
                       <span className="text-gray-300">
                         {t("Dashboard.operating")}
                       </span>
-                    </div>
-                    <span className="text-white">231</span>
+                    </div>{" "}
+                    <span className="text-white">
+                      {dashboardData.loading
+                        ? "..."
+                        : dashboardData.statusStats.operating}
+                    </span>
                   </div>
                   <div className="flex justify-between items-center">
                     <div className="flex items-center">
@@ -337,8 +380,12 @@ function Dashboard() {
                         {t("Dashboard.warning")}
                       </span>
                     </div>
-                    <span className="text-white">45</span>
-                  </div>{" "}
+                    <span className="text-white">
+                      {dashboardData.loading
+                        ? "..."
+                        : dashboardData.statusStats.warning}
+                    </span>
+                  </div>
                   <div className="flex justify-between items-center">
                     <div className="flex items-center">
                       <div className="w-3 h-3 rounded-full bg-red-500 mr-2"></div>
@@ -346,7 +393,11 @@ function Dashboard() {
                         {t("Dashboard.error")}
                       </span>
                     </div>
-                    <span className="text-white">18</span>
+                    <span className="text-white">
+                      {dashboardData.loading
+                        ? "..."
+                        : dashboardData.statusStats.error}
+                    </span>
                   </div>
                   <div className="flex justify-between items-center">
                     <div className="flex items-center">
@@ -355,7 +406,11 @@ function Dashboard() {
                         {t("Dashboard.undefined")}
                       </span>
                     </div>
-                    <span className="text-white">7</span>
+                    <span className="text-white">
+                      {dashboardData.loading
+                        ? "..."
+                        : dashboardData.statusStats.undefined}
+                    </span>
                   </div>
                 </div>
               </div>

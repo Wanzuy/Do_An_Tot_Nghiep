@@ -48,7 +48,6 @@ function Settings({ t }) {
         errorToast(t("common.noAccess"));
       }
     } else if (url === "/cai-dat/khoi-giam-sat-dau-bao-falc") {
-      // Role 1 hoặc 2 có quyền truy cập quản lý FALC
       if (
         userInfo &&
         (Number(userInfo.role) === 1 || Number(userInfo.role) === 2)
@@ -58,7 +57,14 @@ function Settings({ t }) {
         errorToast(t("common.noAccess"));
       }
     } else if (url === "/cai-dat/khoi-dieu-khien-chuong-den-nac") {
-      errorToast("có lỗi xảy ra! Vui lòng thử lại sau");
+      if (
+        userInfo &&
+        (Number(userInfo.role) === 1 || Number(userInfo.role) === 2)
+      ) {
+        navigate(url);
+      } else {
+        errorToast(t("common.noAccess"));
+      }
     } else if (url === "/cai-dat/dieu-chinh-am-luong") {
       if (
         userInfo &&
