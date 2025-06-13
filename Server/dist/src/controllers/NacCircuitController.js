@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getCircuitsByNacBoardId = exports.deleteNacCircuit = exports.deactivateCircuit = exports.activateCircuit = exports.updateNacCircuit = exports.getNacCircuitById = exports.getAllNacCircuits = exports.createNacCircuit = void 0;
+exports.getCircuitsByZoneId = exports.getCircuitsByNacBoardId = exports.deleteNacCircuit = exports.deactivateCircuit = exports.activateCircuit = exports.updateNacCircuit = exports.getNacCircuitById = exports.getAllNacCircuits = exports.createNacCircuit = void 0;
 // Import các Model, mongoose và hàm ghi log cần thiết
 const mongoose_1 = __importDefault(require("mongoose"));
 const NacCircuitModel_1 = __importDefault(require("../models/NacCircuitModel"));
@@ -32,8 +32,7 @@ const createNacCircuit = (req, res) => __awaiter(void 0, void 0, void 0, functio
                 message: "NacBoard ID không hợp lệ hoặc bị thiếu.",
             });
         }
-        if (!req.body.zoneId ||
-            !mongoose_1.default.Types.ObjectId.isValid(req.body.zoneId)) {
+        if (!req.body.zoneId || !mongoose_1.default.Types.ObjectId.isValid(req.body.zoneId)) {
             return res.status(400).json({
                 success: false,
                 message: "Zone ID không hợp lệ hoặc bị thiếu.",
@@ -56,8 +55,7 @@ const createNacCircuit = (req, res) => __awaiter(void 0, void 0, void 0, functio
         }
         const requestedCircuitNumber = req.body.circuit_number;
         const maxCircuits = nacBoard.circuit_count;
-        if (requestedCircuitNumber < 1 ||
-            requestedCircuitNumber > maxCircuits) {
+        if (requestedCircuitNumber < 1 || requestedCircuitNumber > maxCircuits) {
             return res.status(400).json({
                 success: false,
                 message: `Bo mạch NAC "${nacBoard.name}". Chỉ cho phép gắn ${maxCircuits} mạch circuit.`,
@@ -253,8 +251,7 @@ const updateNacCircuit = (req, res) => __awaiter(void 0, void 0, void 0, functio
                 if (!nacBoard) {
                     return res.status(404).json({
                         success: false,
-                        message: "Không tìm thấy Bo mạch NAC với ID mới " +
-                            req.body.nacBoardId,
+                        message: "Không tìm thấy Bo mạch NAC với ID mới " + req.body.nacBoardId,
                     });
                 }
             }
@@ -274,8 +271,7 @@ const updateNacCircuit = (req, res) => __awaiter(void 0, void 0, void 0, functio
                 if (!zone) {
                     return res.status(404).json({
                         success: false,
-                        message: "Không tìm thấy Vùng (Zone) với ID mới " +
-                            req.body.zoneId,
+                        message: "Không tìm thấy Vùng (Zone) với ID mới " + req.body.zoneId,
                     });
                 }
             }
@@ -327,8 +323,7 @@ const updateNacCircuit = (req, res) => __awaiter(void 0, void 0, void 0, functio
             res.status(500).json({
                 success: false,
                 message: error.message ||
-                    "Lỗi khi cập nhật thông tin Mạch NAC với ID " +
-                        req.params.id,
+                    "Lỗi khi cập nhật thông tin Mạch NAC với ID " + req.params.id,
             });
         }
     }
@@ -514,8 +509,7 @@ const deactivateCircuit = (req, res) => __awaiter(void 0, void 0, void 0, functi
         res.status(500).json({
             success: false,
             message: error.message ||
-                "Đã xảy ra lỗi khi hủy kích hoạt Mạch NAC với ID " +
-                    req.params.id,
+                "Đã xảy ra lỗi khi hủy kích hoạt Mạch NAC với ID " + req.params.id,
         });
     }
 });
@@ -566,8 +560,7 @@ const deleteNacCircuit = (req, res) => __awaiter(void 0, void 0, void 0, functio
         }
         res.status(500).json({
             success: false,
-            message: error.message ||
-                "Không thể xóa Mạch NAC với ID " + req.params.id,
+            message: error.message || "Không thể xóa Mạch NAC với ID " + req.params.id,
         });
     }
 });
@@ -618,4 +611,51 @@ const getCircuitsByNacBoardId = (req, res) => __awaiter(void 0, void 0, void 0, 
     }
 });
 exports.getCircuitsByNacBoardId = getCircuitsByNacBoardId;
+/**
+ * Get NAC circuits by Zone ID
+ */
+const getCircuitsByZoneId = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        // Validate zone ID
+        if (!mongoose_1.default.Types.ObjectId.isValid(req.params.zoneId)) {
+            return res.status(400).json({
+                success: false,
+                message: "Zone ID không hợp lệ.",
+            });
+        }
+        // Check if zone exists
+        const zone = yield ZoneModel_1.default.findById(req.params.zoneId);
+        if (!zone) {
+            return res.status(404).json({
+                success: false,
+                message: "Không tìm thấy Zone với ID " + req.params.zoneId,
+            });
+        }
+        // Get circuits by zone ID
+        const circuits = yield NacCircuitModel_1.default.find({ zoneId: req.params.zoneId })
+            .populate("nacBoardId", "name description") // Populate NAC board info
+            .populate("zoneId", "name description") // Populate zone info
+            .sort({ circuit_number: 1 }); // Sort by circuit number
+        res.status(200).json({
+            success: true,
+            count: circuits.length,
+            data: circuits,
+        });
+    }
+    catch (error) {
+        console.error("Lỗi khi lấy danh sách Mạch NAC theo Zone ID:", error);
+        if (error.kind === "ObjectId") {
+            return res.status(400).json({
+                success: false,
+                message: "Zone ID không hợp lệ.",
+            });
+        }
+        res.status(500).json({
+            success: false,
+            message: error.message ||
+                "Đã xảy ra lỗi khi lấy danh sách Mạch NAC theo Zone ID.",
+        });
+    }
+});
+exports.getCircuitsByZoneId = getCircuitsByZoneId;
 //# sourceMappingURL=NacCircuitController.js.map

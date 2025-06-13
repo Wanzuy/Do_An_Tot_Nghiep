@@ -18,6 +18,7 @@ const TimeRouter_1 = __importDefault(require("./src/routers/TimeRouter"));
 const EventLogRouter_1 = __importDefault(require("./src/routers/EventLogRouter"));
 const ChatbotRouter_1 = __importDefault(require("./src/routers/ChatbotRouter"));
 const VolumeRouter_1 = __importDefault(require("./src/routers/VolumeRouter"));
+const StatisticsRouter_1 = __importDefault(require("./src/routers/StatisticsRouter"));
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 const port = process.env.PORT || 5000;
@@ -34,6 +35,7 @@ app.use("/times", TimeRouter_1.default);
 app.use("/volumes", VolumeRouter_1.default);
 app.use("/eventlogs", EventLogRouter_1.default);
 app.use("/api/chatbot", ChatbotRouter_1.default);
+app.use("/statistics", StatisticsRouter_1.default);
 (0, connect_1.default)()
     .then(() => {
     app.listen(port, (err) => {

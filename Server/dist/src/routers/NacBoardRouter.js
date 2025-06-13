@@ -8,6 +8,7 @@ router.get("/with-circuits", NacBoardController_1.getNacBoardsWithCircuits);
 router.get("/:id", NacBoardController_1.getNacBoardById);
 router.post("/", NacBoardController_1.createNacBoard);
 router.put("/:id", NacBoardController_1.updateNacBoard);
+router.patch("/:id/status", NacBoardController_1.updateNacBoardStatus);
 router.delete("/:id", NacBoardController_1.deleteNacBoard);
 exports.default = router;
 //# sourceMappingURL=NacBoardRouter.js.map

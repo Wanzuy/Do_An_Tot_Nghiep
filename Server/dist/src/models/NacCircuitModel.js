@@ -44,7 +44,6 @@ const nacCircuitSchema = new mongoose_1.Schema({
         // Liên kết đến Phân vùng (Zone) mà mạch này phục vụ
         type: mongoose_1.Schema.Types.ObjectId,
         ref: "zones",
-        required: true,
     },
     name: {
         type: String,

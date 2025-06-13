@@ -12,11 +12,59 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getNacBoardsWithCircuits = exports.deleteNacBoard = exports.updateNacBoard = exports.getNacBoardById = exports.getAllNacBoards = exports.createNacBoard = void 0;
+exports.getNacBoardsWithCircuits = exports.deleteNacBoard = exports.updateNacBoard = exports.getNacBoardById = exports.getAllNacBoards = exports.createNacBoard = exports.updateNacBoardStatus = void 0;
 const mongoose_1 = __importDefault(require("mongoose"));
 const NacBoardModel_1 = __importDefault(require("../models/NacBoardModel"));
 const PanelModel_1 = __importDefault(require("../models/PanelModel"));
 const NacCircuitModel_1 = __importDefault(require("../models/NacCircuitModel"));
+/**
+ * Update NAC board status by ID
+ */
+const updateNacBoardStatus = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        // Kiểm tra ID hợp lệ
+        if (!mongoose_1.default.Types.ObjectId.isValid(req.params.id)) {
+            return res.status(404).json({
+                success: false,
+                message: "Không tìm thấy bo mạch NAC với ID " + req.params.id,
+            });
+        }
+        // Kiểm tra is_active có được cung cấp không
+        if (req.body.is_active === undefined || req.body.is_active === null) {
+            return res.status(400).json({
+                success: false,
+                message: "Trạng thái hoạt động (is_active) là bắt buộc.",
+            });
+        }
+        const updatedNacBoard = yield NacBoardModel_1.default.findByIdAndUpdate(req.params.id, { is_active: req.body.is_active }, { new: true, runValidators: true }).populate("panelId", "name panel_type");
+        if (!updatedNacBoard) {
+            return res.status(404).json({
+                success: false,
+                message: "Không tìm thấy bo mạch NAC với ID " + req.params.id,
+            });
+        }
+        res.status(200).json({
+            success: true,
+            message: `${req.body.is_active ? "Bật" : "Tắt"} bo mạch NAC thành công.`,
+            data: updatedNacBoard,
+        });
+    }
+    catch (error) {
+        console.error("Lỗi khi cập nhật trạng thái bo mạch NAC:", error);
+        if (error.kind === "ObjectId") {
+            return res.status(404).json({
+                success: false,
+                message: "Không tìm thấy bo mạch NAC với ID " + req.params.id,
+            });
+        }
+        res.status(500).json({
+            success: false,
+            message: error.message ||
+                "Lỗi khi cập nhật trạng thái bo mạch NAC với ID " + req.params.id,
+        });
+    }
+});
+exports.updateNacBoardStatus = updateNacBoardStatus;
 /**
  * Create a new NAC board
  */
@@ -90,10 +138,17 @@ const getAllNacBoards = (req, res) => __awaiter(void 0, void 0, void 0, function
         const nacBoards = yield NacBoardModel_1.default.find(query)
             .populate("panelId", "name panel_type") // Populate panelId
             .sort({ createdAt: -1 }); // Mặc định sắp xếp theo thời gian tạo giảm dần
+        // Thêm thông tin số lượng circuits thực tế cho mỗi board
+        const nacBoardsWithCircuitCount = yield Promise.all(nacBoards.map((board) => __awaiter(void 0, void 0, void 0, function* () {
+            const circuitCount = yield NacCircuitModel_1.default.countDocuments({
+                nacBoardId: board._id,
+            });
+            return Object.assign(Object.assign({}, board.toObject()), { actual_circuit_count: circuitCount });
+        })));
         res.status(200).json({
             success: true,
-            count: nacBoards.length,
-            data: nacBoards,
+            count: nacBoardsWithCircuitCount.length,
+            data: nacBoardsWithCircuitCount,
         });
     }
     catch (error) {
@@ -149,8 +204,7 @@ const getNacBoardById = (req, res) => __awaiter(void 0, void 0, void 0, function
         }
         res.status(500).json({
             success: false,
-            message: error.message ||
-                "Lỗi khi lấy bo mạch NAC với ID " + req.params.id,
+            message: error.message || "Lỗi khi lấy bo mạch NAC với ID " + req.params.id,
         });
     }
 });
@@ -185,8 +239,7 @@ const updateNacBoard = (req, res) => __awaiter(void 0, void 0, void 0, function*
                 if (!panel) {
                     return res.status(404).json({
                         success: false,
-                        message: "Không tìm thấy tủ (Panel) với ID mới " +
-                            req.body.panelId,
+                        message: "Không tìm thấy tủ (Panel) với ID mới " + req.body.panelId,
                     });
                 }
             }
@@ -200,10 +253,15 @@ const updateNacBoard = (req, res) => __awaiter(void 0, void 0, void 0, function*
             });
             return;
         }
+        // Thêm thông tin số lượng circuits thực tế
+        const circuitCount = yield NacCircuitModel_1.default.countDocuments({
+            nacBoardId: updatedNacBoard._id,
+        });
+        const nacBoardWithCircuitCount = Object.assign(Object.assign({}, updatedNacBoard.toObject()), { actual_circuit_count: circuitCount });
         res.status(200).json({
             success: true,
             message: "Cập nhật bo mạch NAC thành công.",
-            data: updatedNacBoard,
+            data: nacBoardWithCircuitCount,
         });
     }
     catch (error) {
@@ -281,8 +339,7 @@ const deleteNacBoard = (req, res) => __awaiter(void 0, void 0, void 0, function*
         }
         res.status(500).json({
             success: false,
-            message: error.message ||
-                "Không thể xóa bo mạch NAC với ID " + req.params.id,
+            message: error.message || "Không thể xóa bo mạch NAC với ID " + req.params.id,
         });
     }
 });

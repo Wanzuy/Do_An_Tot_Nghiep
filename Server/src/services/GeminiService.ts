@@ -334,7 +334,8 @@ export const generateFireSafetyResponse = async (
 
     **6. Xử lý sự cố và báo động:**
     - Xử lý và ghi nhận sự cố, báo động trong hệ thống
-    - Hướng dẫn xử lý ban đầu và liên hệ lực lượng PCCC 114    - Phân biệt và xử lý các kịch bản báo động giả
+    - Hướng dẫn xử lý ban đầu và liên hệ lực lượng PCCC 114    
+    - Phân biệt và xử lý các kịch bản báo động giả
     - Quy trình ứng phó khẩn cấp và sơ tán
 
     **7. Cấu hình tủ điều khiển (FACP):**

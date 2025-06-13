@@ -13,6 +13,7 @@ import timeRouter from "./src/routers/TimeRouter";
 import EventLogRouter from "./src/routers/EventLogRouter";
 import chatbotRouter from "./src/routers/ChatbotRouter";
 import volumeRouter from "./src/routers/VolumeRouter";
+import statisticsRouter from "./src/routers/StatisticsRouter";
 
 dotenv.config();
 
@@ -33,16 +34,17 @@ app.use("/times", timeRouter);
 app.use("/volumes", volumeRouter);
 app.use("/eventlogs", EventLogRouter);
 app.use("/api/chatbot", chatbotRouter);
+app.use("/statistics", statisticsRouter);
 
 connectDB()
-    .then(() => {
-        app.listen(port, (err) => {
-            if (err) {
-                throw new Error(err.message);
-            }
-            console.log(`Server is listening on http://localhost:${port}`);
-        });
-    })
-    .catch((error) => {
-        console.log(error);
+  .then(() => {
+    app.listen(port, (err) => {
+      if (err) {
+        throw new Error(err.message);
+      }
+      console.log(`Server is listening on http://localhost:${port}`);
     });
+  })
+  .catch((error) => {
+    console.log(error);
+  });
