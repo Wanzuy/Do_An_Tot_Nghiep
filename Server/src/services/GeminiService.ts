@@ -268,7 +268,7 @@ export const generateFireSafetyResponse = async (
         : "- Chưa có cài đặt âm lượng nào"
     }
 
-    **Nhật ký sự cố/sự kiện gần đây (50 bản ghi mới nhất):**
+    **Nhật ký sự cố/sự kiện gần đây:**
     ${
       systemData.eventLogs.length > 0
         ? systemData.eventLogs
