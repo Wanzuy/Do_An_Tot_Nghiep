@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.acknowledgeEvent = exports.getEventById = exports.getAllEvents = exports.createEventLog = void 0;
 const mongoose_1 = __importDefault(require("mongoose"));
 const EventLogModel_1 = __importDefault(require("../models/EventLogModel"));
+const DetectorModel_1 = __importDefault(require("../models/DetectorModel"));
 const createEventLog = (eventType_1, description_1, sourceType_1, sourceId_1, zoneId_1, panelId_1, ...args_1) => __awaiter(void 0, [eventType_1, description_1, sourceType_1, sourceId_1, zoneId_1, panelId_1, ...args_1], void 0, function* (eventType, description, sourceType, sourceId, zoneId, panelId, status = "Info", details = null) {
     try {
         const newLog = new EventLogModel_1.default({
@@ -55,8 +56,7 @@ const getAllEvents = (req, res) => __awaiter(void 0, void 0, void 0, function* (
                 });
             }
             query.zoneId = req.query.zoneId;
-        }
-        // Lọc theo panel
+        } // Lọc theo panel
         if (req.query.panelId) {
             if (!mongoose_1.default.Types.ObjectId.isValid(req.query.panelId)) {
                 return res.status(400).json({
@@ -64,7 +64,7 @@ const getAllEvents = (req, res) => __awaiter(void 0, void 0, void 0, function* (
                     message: "Định dạng ID Panel trong tham số truy vấn không hợp lệ.",
                 });
             }
-            query.paneliId = req.query.panelId;
+            query.panelId = req.query.panelId;
         }
         // Lọc theo loại nguồn
         if (req.query.sourceType) {
@@ -92,15 +92,14 @@ const getAllEvents = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         const page = parseInt(req.query.page, 10) || 1;
         const limit = parseInt(req.query.limit, 10) || 50; // Mặc định 50 bản ghi mỗi trang
         const skip = (page - 1) * limit;
-        const sort = req.query.sortBy || "-timestamp"; // Mặc định sắp xếp theo thời gian giảm dần
-        // Lấy logs
+        const sort = req.query.sortBy || "-timestamp"; // Mặc định sắp xếp theo thời gian giảm dần    // Lấy logs
         const logs = yield EventLogModel_1.default.find(query)
             .sort(sort)
             .skip(skip)
             .limit(limit)
             // Populate các trường có ref cố định nếu cần (Zone, Panel, User)
             .populate("zoneId", "name")
-            .populate("paneliId", "name")
+            .populate("panelId", "name")
             // .populate('acknowledged_by_user_id', 'username') // Cần Model User
             .exec();
         // Lấy tổng số document cho phân trang
@@ -137,7 +136,7 @@ const getEventById = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         }
         const log = yield EventLogModel_1.default.findById(req.params.id)
             .populate("zoneId", "name")
-            .populate("paneliId", "name");
+            .populate("panelId", "name");
         // .populate('acknowledged_by_user_id', 'username'); // Cần Model User
         if (!log) {
             return res.status(404).json({
@@ -157,8 +156,7 @@ const getEventById = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         }
         res.status(500).json({
             success: false,
-            message: error.message ||
-                "Lỗi khi lấy bản ghi sự kiện với ID " + req.params.id,
+            message: error.message || "Lỗi khi lấy bản ghi sự kiện với ID " + req.params.id,
         });
     }
 });
@@ -179,8 +177,7 @@ const acknowledgeEvent = (req, res) => __awaiter(void 0, void 0, void 0, functio
         // if (!req.body.userId || !mongoose.Types.ObjectId.isValid(req.body.userId)) {
         //     return res.status(400).json({ success: false, message: "ID người dùng xác nhận không hợp lệ." });
         // }
-        // const user = await User.findById(req.body.userId); // Cần Model User
-        // if (!user) {
+        // const user = await User.findById(req.body.userId); // Cần Model User    // if (!user) {
         //      return res.status(404).json({ success: false, message: "Không tìm thấy người dùng xác nhận với ID " + req.body.userId });
         // }
         const updatedLog = yield EventLogModel_1.default.findByIdAndUpdate(req.params.id, {
@@ -190,13 +187,28 @@ const acknowledgeEvent = (req, res) => __awaiter(void 0, void 0, void 0, functio
         }, { new: true } // Trả về document sau khi cập nhật
         )
             .populate("zoneId", "name")
-            .populate("paneliId", "name");
+            .populate("panelId", "name");
         // .populate('acknowledged_by_user_id', 'username');
         if (!updatedLog) {
             return res.status(404).json({
                 success: false,
                 message: "Không tìm thấy bản ghi sự kiện với ID " + req.params.id,
             });
+        }
+        // Nếu sự kiện liên quan đến detector, cập nhật trạng thái detector về bình thường
+        if (updatedLog.source_type === "Detector" && updatedLog.source_id) {
+            try {
+                yield DetectorModel_1.default.findByIdAndUpdate(updatedLog.source_id, {
+                    status: "Normal",
+                    is_active: true,
+                    last_reported_at: new Date(),
+                });
+            }
+            catch (detectorError) {
+                console.error("Lỗi khi cập nhật trạng thái detector:", detectorError);
+                // Không return error ở đây vì việc acknowledge event đã thành công
+                // Chỉ log lỗi để theo dõi
+            }
         }
         res.status(200).json({
             success: true,
@@ -214,8 +226,7 @@ const acknowledgeEvent = (req, res) => __awaiter(void 0, void 0, void 0, functio
         }
         res.status(500).json({
             success: false,
-            message: error.message ||
-                "Lỗi khi xác nhận sự kiện với ID " + req.params.id,
+            message: error.message || "Lỗi khi xác nhận sự kiện với ID " + req.params.id,
         });
     }
 });

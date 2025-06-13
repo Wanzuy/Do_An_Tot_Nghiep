@@ -431,17 +431,17 @@ const updateDetectorStatus = (req, res) => __awaiter(void 0, void 0, void 0, fun
             if (eventType === "Fire Alarm") {
                 // Điều chỉnh logic mô tả dựa trên enum detector_type mới
                 if (detectorType === "Smoke") {
-                    description = `BÁO ĐỘNG CHÁY: Phát hiện khói ${readingInfo} từ ${fullDetectorInfo}${zoneName}.`;
+                    description = `BÁO ĐỘNG: Phát hiện khói ${readingInfo} từ ${fullDetectorInfo}${zoneName}.`;
                 }
                 else if (detectorType === "Heat") {
-                    description = `BÁO ĐỘNG CHÁY: Nhiệt độ tăng cao ${readingInfo} được phát hiện bởi ${fullDetectorInfo}${zoneName}.`;
+                    description = `BÁO ĐỘNG: Nhiệt độ tăng cao ${readingInfo} được phát hiện bởi ${fullDetectorInfo}${zoneName}.`;
                 }
                 else if (detectorType === "Gas") {
-                    description = `BÁO ĐỘNG KHÍ GAS: Phát hiện rò rỉ khí gas: ${readingInfo} từ ${fullDetectorInfo}${zoneName}.`;
+                    description = `BÁO ĐỘNG: Phát hiện rò rỉ khí gas: ${readingInfo} từ ${fullDetectorInfo}${zoneName}.`;
                 }
                 // Nếu detector_type không thuộc enum mới, description sẽ là mặc định hoặc cần xử lý thêm
                 else {
-                    description = `BÁO ĐỘNG CHÁY: Sự kiện báo động từ ${fullDetectorInfo}${zoneName}${readingInfo}.`;
+                    description = `BÁO ĐỘNG: Sự kiện báo động từ ${fullDetectorInfo}${zoneName}${readingInfo}.`;
                 }
             }
             else if (eventType === "Fault") {

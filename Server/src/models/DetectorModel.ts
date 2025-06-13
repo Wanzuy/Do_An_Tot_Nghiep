@@ -32,9 +32,9 @@ const detectorSchema = new Schema(
       default: null,
     },
     status: {
-      // Trạng thái hiện tại (Normal (Đầu báo đang hoạt động bình thường, không có lỗi), Alarm (Đầu báo phát hiện sự cố, cảnh báo), Fault (Đầu báo gặp sự cố hoặc lỗi), Disabled (Đầu báo bị tắt hoặc không hoạt động))
+      // Trạng thái hiện tại (Normal (Đầu báo đang hoạt động bình thường, không có lỗi), Alarm (Đầu báo phát hiện sự cố, cảnh báo), Fault (Đầu báo gặp sự cố hoặc lỗi))
       type: String,
-      enum: ["Normal", "Alarm", "Fault", "Disabled"],
+      enum: ["Normal", "Alarm", "Fault"],
       default: "Normal",
     },
     is_active: {
