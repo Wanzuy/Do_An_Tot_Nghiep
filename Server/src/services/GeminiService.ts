@@ -101,16 +101,17 @@ const getSystemData = async () => {
       .select(
         "name detector_address detector_type status is_active falcBoardId zoneId last_reading last_reported_at"
       )
-      .lean(); // lấy thông tin về các sự cố đã ghi nhận với thông tin chi tiết
+      .lean();
+
+    // lấy thông tin về các sự cố và nhật ký sự kiện
     const incidentLogs = await EventLogModel.find({})
       .populate("zoneId", "name description")
-      .populate("panelId", "name panel_type location")
-      .populate("acknowledged_by_user_id", "username email")
+      .populate("panelId", "name location")
       .select(
-        "timestamp event_type description source_type source_id status acknowledged_at acknowledged_by_user_id zoneId panelId severity priority"
+        "timestamp event_type source_type source_id description status priority severity acknowledged_at acknowledged_by_user_id zoneId panelId"
       )
-      .sort({ timestamp: -1 })
-      .limit(100) // Giới hạn 100 bản ghi gần nhất để tránh quá tải
+      .sort({ timestamp: -1 }) // Sắp xếp theo thời gian mới nhất
+      .limit(100) // Giới hạn 100 sự cố gần nhất
       .lean();
 
     // Tính toán số lượng đầu báo hiện có cho mỗi bo mạch FALC
@@ -132,7 +133,6 @@ const getSystemData = async () => {
       falcBoards: falcBoardsWithDetectorCount || [],
       detectors: detectors || [],
       incidentLogs: incidentLogs || [],
-      incidentStats: analyzeIncidentStatistics(incidentLogs || []),
       lastUpdated: new Date().toISOString(),
     };
   } catch (error) {
@@ -144,34 +144,6 @@ const getSystemData = async () => {
       falcBoards: [],
       detectors: [],
       incidentLogs: [],
-      incidentStats: {
-        total: 0,
-        active: 0,
-        cleared: 0,
-        unacknowledged: 0,
-        byType: {
-          fireAlarm: 0,
-          fault: 0,
-          restore: 0,
-          offline: 0,
-          activation: 0,
-          deactivation: 0,
-          statusChange: 0,
-          configChange: 0,
-        },
-        bySource: {
-          detector: 0,
-          nac: 0,
-          panel: 0,
-        },
-        byTime: {
-          today: 0,
-          thisWeek: 0,
-          thisMonth: 0,
-        },
-        criticalIncidents: 0,
-        pendingIncidents: 0,
-      },
       lastUpdated: new Date().toISOString(),
       error: "Không thể lấy dữ liệu từ hệ thống",
     };
@@ -231,7 +203,8 @@ export const generateFireSafetyResponse = async (
             )
             .join("\n")
         : "- Chưa có hẹn giờ nào"
-    }    **Danh sách Bo mạch FALC hiện có:**
+    }    
+    **Danh sách Bo mạch FALC hiện có:**
     ${
       systemData.falcBoards.length > 0
         ? systemData.falcBoards
@@ -299,56 +272,41 @@ export const generateFireSafetyResponse = async (
     }    **Nhật ký, thống kê, ghi nhận sự cố hiện có (100 sự cố gần nhất):**
     **LƯU Ý QUAN TRỌNG: "Sự cố" và "Sự kiện" trong hệ thống này là CÙNG MỘT KHÁI NIỆM, đều là các bản ghi trong EventLog.**
     
-    **PHÂN TÍCH THỐNG KÊ CHI TIẾT:**
-    📊 **Tổng quan:**
-    - Tổng số sự cố/sự kiện: **${systemData.incidentStats.total}**
-    - 🔴 Sự cố đang hoạt động (Active): **${systemData.incidentStats.active}** 
-    - ✅ Sự cố đã xử lý (Cleared): **${systemData.incidentStats.cleared}**
-    - ❌ Sự cố chưa xác nhận: **${systemData.incidentStats.unacknowledged}**
-    - 🚨 Sự cố cháy cần ưu tiên: **${
-      systemData.incidentStats.criticalIncidents
-    }**
-    - ⚠️ Sự cố khác cần xử lý: **${systemData.incidentStats.pendingIncidents}**
+    **THỐNG KÊ TỔNG QUAN:**
+    - Tổng số sự cố/sự kiện: ${systemData.incidentLogs.length}
+    - Sự cố đang hoạt động (Active): ${
+      systemData.incidentLogs.filter((log: any) => log.status === "Active")
+        .length
+    }
+    - Sự cố đã xử lý (Cleared): ${
+      systemData.incidentLogs.filter((log: any) => log.status === "Cleared")
+        .length
+    }
+    - Sự cố chưa xác nhận: ${
+      systemData.incidentLogs.filter((log: any) => !log.acknowledged_at).length
+    }
+    - Báo động cháy (Fire Alarm): ${
+      systemData.incidentLogs.filter(
+        (log: any) => log.event_type === "Fire Alarm"
+      ).length
+    }
+    - Lỗi hệ thống (Fault): ${
+      systemData.incidentLogs.filter((log: any) => log.event_type === "Fault")
+        .length
+    }
+    - Khôi phục (Restore): ${
+      systemData.incidentLogs.filter((log: any) => log.event_type === "Restore")
+        .length
+    }
+    - Mất kết nối (Offline): ${
+      systemData.incidentLogs.filter((log: any) => log.event_type === "Offline")
+        .length
+    }
     
-    📈 **Thống kê theo loại sự cố:**
-    - 🔥 Báo động cháy (Fire Alarm): **${
-      systemData.incidentStats.byType.fireAlarm
-    }**
-    - ⚠️ Lỗi hệ thống (Fault): **${systemData.incidentStats.byType.fault}**
-    - 🔄 Khôi phục (Restore): **${systemData.incidentStats.byType.restore}**  
-    - 📡 Mất kết nối (Offline): **${systemData.incidentStats.byType.offline}**
-    - 🟢 Kích hoạt (Activation): **${
-      systemData.incidentStats.byType.activation
-    }**
-    - 🔴 Vô hiệu hóa (Deactivation): **${
-      systemData.incidentStats.byType.deactivation
-    }**
-    - 🔄 Thay đổi trạng thái (StatusChange): **${
-      systemData.incidentStats.byType.statusChange
-    }**
-    - ⚙️ Thay đổi cấu hình (ConfigChange): **${
-      systemData.incidentStats.byType.configChange
-    }**
-    
-    🎯 **Thống kê theo nguồn phát sinh:**
-    - 🔍 Từ đầu báo (Detector): **${
-      systemData.incidentStats.bySource.detector
-    }**
-    - 🔊 Từ mạch báo động (NAC): **${systemData.incidentStats.bySource.nac}**
-    - 🏢 Từ tủ điều khiển (Panel): **${
-      systemData.incidentStats.bySource.panel
-    }**
-    
-    ⏰ **Thống kê theo thời gian:**
-    - Hôm nay: **${systemData.incidentStats.byTime.today}** sự cố
-    - 7 ngày qua: **${systemData.incidentStats.byTime.thisWeek}** sự cố
-    - Tháng này: **${systemData.incidentStats.byTime.thisMonth}** sự cố
-    
-    **CHI TIẾT CÁC SỰ CỐ/SỰ KIỆN (20 sự cố gần nhất):**
+    **CHI TIẾT CÁC SỰ CỐ/SỰ KIỆN:**
     ${
       systemData.incidentLogs.length > 0
         ? systemData.incidentLogs
-            .slice(0, 20) // Chỉ hiển thị 20 sự cố gần nhất để tránh quá dài
             .map(
               (log: any, index: number) =>
                 `${index + 1}. **[${
@@ -425,12 +383,6 @@ export const generateFireSafetyResponse = async (
         : "- ✅ Chưa có sự cố nào được ghi nhận trong hệ thống"
     }
     
-    ${
-      systemData.incidentLogs.length > 20
-        ? `\n**Lưu ý:** Hiển thị 20/${systemData.incidentLogs.length} sự cố gần nhất. Để xem đầy đủ, vui lòng sử dụng tính năng lọc hoặc tìm kiếm cụ thể.`
-        : ""
-    }
-
     **Thông tin cập nhật:** ${systemData.lastUpdated}
     ${systemData.error ? `**Lưu ý:** ${systemData.error}` : ""}
 
@@ -456,12 +408,13 @@ export const generateFireSafetyResponse = async (
     - Cấu hình các chế độ hoạt động theo thời gian
     - Quản lý lịch kiểm tra định kỳ và bảo trì.
 
-    **5. Quản lý và phân tích sự cố/Event Log được nâng cấp:**
-    - **HỆ THỐNG THỐNG KÊ TỰ ĐỘNG:** Phân tích thống kê chi tiết theo loại sự cố, nguồn phát sinh, thời gian
-    - **CẢI THIỆN ĐỘ CHÍNH XÁC:** Truy vấn dữ liệu với thông tin đầy đủ và populate các trường liên quan
-    - **PHÂN LOẠI ƯU TIÊN:** Tự động xác định sự cố nguy hiểm (Fire Alarm Active) và sự cố cần xử lý
-    - **HIỂN THỊ TRỰC QUAN:** Sử dụng emoji và format rõ ràng để dễ đọc và nhận biết
-    - **GIỚI HẠN DỮ LIỆU:** Lấy 100 sự cố gần nhất, hiển thị 20 sự cố để tránh quá tải thông tin
+    **5. Quản lý và phân tích sự cố/Event Log:**
+    - **Các loại sự cố:** Fire Alarm (báo động cháy), Fault (lỗi hệ thống), Restore (khôi phục), Offline (mất kết nối), Activation (kích hoạt), Deactivation (vô hiệu hóa), StatusChange (thay đổi trạng thái), ConfigChange (thay đổi cấu hình)
+    - **Nguồn sự cố:** Detector (từ đầu báo), NAC (từ mạch báo động), Panel (từ tủ điều khiển)
+    - **Trạng thái xử lý:** Active (cần xử lý ngay), Cleared (đã xử lý xong), Info (thông tin tham khảo)
+    - **Phân tích xu hướng:** Thống kê tần suất sự cố theo thời gian, khu vực, loại thiết bị
+    - **Quy trình xử lý:** Xác nhận sự cố, phân loại mức độ ưu tiên, giao việc xử lý, theo dõi tiến độ
+    - **Báo cáo sự cố:** Tạo báo cáo chi tiết, thống kê hiệu suất hệ thống, đề xuất cải thiện
 
     **6. Xử lý sự cố và báo động:**
     - Xử lý và ghi nhận sự cố, báo động trong hệ thống
@@ -513,14 +466,6 @@ export const generateFireSafetyResponse = async (
     - Không xưng hô với người dùng bằng các vai vế gia đình
     - Luôn xưng hô trung lập: "bạn", "quý khách", "người dùng"
     - Từ chối lịch sự các yêu cầu không phù hợp và giải thích lý do
-
-    **HƯỚNG DẪN TRẢ LỜI VỀ SỰ CỐ:**
-    - Khi người dùng hỏi về "số lượng sự cố", hãy sử dụng \`systemData.incidentStats.total\`
-    - Khi hỏi về "sự cố đang xảy ra" hoặc "sự cố chưa xử lý", sử dụng \`systemData.incidentStats.active\`
-    - Khi hỏi về "sự cố khẩn cấp" hoặc "cháy", sử dụng \`systemData.incidentStats.criticalIncidents\`
-    - Luôn cung cấp thống kê chi tiết và phân tích xu hướng khi được hỏi
-    - Giải thích rõ ràng ý nghĩa của từng loại sự cố và mức độ ưu tiên
-    - Đưa ra khuyến nghị xử lý dựa trên tình trạng sự cố hiện tại
     `;
 
   // Thêm context từ lịch sử hội thoại
@@ -538,86 +483,16 @@ export const generateFireSafetyResponse = async (
 // Hàm này dùng để tạo các gợi ý nhanh cho người dùng
 export const generateQuickSuggestions = async (): Promise<string[]> => {
   return [
-    "Tổng quan trạng thái hệ thống báo cháy hiện tại?",
-    "Có bao nhiêu sự cố đang cần xử lý không?",
-    "Danh sách các sự cố cháy khẩn cấp?",
-    "Thống kê sự cố theo loại và mức độ nghiêm trọng?",
-    "Phân tích xu hướng sự cố 7 ngày qua?",
-    "Sự cố nào chưa được xác nhận?",
-    "Trạng thái các đầu báo có vấn đề?",
-    "Danh sách bo mạch FALC và tình trạng hoạt động?",
-    "Cấu hình âm lượng và hẹn giờ hiện tại?",
-    "Kiểm tra tình trạng kết nối các thiết bị?",
-    "Hướng dẫn xử lý sự cố báo động cháy?",
-    "So sánh hiệu suất hệ thống tháng này với tháng trước?",
+    "Danh sách các tủ báo cháy hiện có?",
+    "Mức âm lượng hiện tại của hệ thống?",
+    "Danh sách các hẹn giờ đã được cấu hình?",
+    "Có bao nhiêu bo mạch FALC trong hệ thống?",
+    "Danh sách các bo mạch FALC và thông tin chi tiết?",
+    "Danh sách đầu báo của từng bo mạch FALC?",
+    "Trạng thái hiện tại của các đầu báo?",
+    "Các sự cố báo cháy gần đây?",
+    "Thống kê sự cố theo loại và trạng thái?",
+    "Sự cố nào đang cần xử lý?",
+    "Phân tích xu hướng sự cố hệ thống?",
   ];
-};
-
-// Hàm phân tích thống kê sự cố chi tiết
-const analyzeIncidentStatistics = (incidentLogs: any[]) => {
-  const now = new Date();
-  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const thisWeek = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
-  const thisMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-
-  const stats = {
-    total: incidentLogs.length,
-    active: incidentLogs.filter((log) => log.status === "Active").length,
-    cleared: incidentLogs.filter((log) => log.status === "Cleared").length,
-    unacknowledged: incidentLogs.filter((log) => !log.acknowledged_at).length,
-
-    // Thống kê theo loại sự cố
-    byType: {
-      fireAlarm: incidentLogs.filter((log) => log.event_type === "Fire Alarm")
-        .length,
-      fault: incidentLogs.filter((log) => log.event_type === "Fault").length,
-      restore: incidentLogs.filter((log) => log.event_type === "Restore")
-        .length,
-      offline: incidentLogs.filter((log) => log.event_type === "Offline")
-        .length,
-      activation: incidentLogs.filter((log) => log.event_type === "Activation")
-        .length,
-      deactivation: incidentLogs.filter(
-        (log) => log.event_type === "Deactivation"
-      ).length,
-      statusChange: incidentLogs.filter(
-        (log) => log.event_type === "StatusChange"
-      ).length,
-      configChange: incidentLogs.filter(
-        (log) => log.event_type === "ConfigChange"
-      ).length,
-    },
-
-    // Thống kê theo nguồn
-    bySource: {
-      detector: incidentLogs.filter((log) => log.source_type === "Detector")
-        .length,
-      nac: incidentLogs.filter((log) => log.source_type === "NAC").length,
-      panel: incidentLogs.filter((log) => log.source_type === "Panel").length,
-    },
-
-    // Thống kê theo thời gian
-    byTime: {
-      today: incidentLogs.filter((log) => new Date(log.timestamp) >= today)
-        .length,
-      thisWeek: incidentLogs.filter(
-        (log) => new Date(log.timestamp) >= thisWeek
-      ).length,
-      thisMonth: incidentLogs.filter(
-        (log) => new Date(log.timestamp) >= thisMonth
-      ).length,
-    },
-
-    // Sự cố cần ưu tiên (Active Fire Alarm)
-    criticalIncidents: incidentLogs.filter(
-      (log) => log.status === "Active" && log.event_type === "Fire Alarm"
-    ).length,
-
-    // Sự cố cần xử lý (Active nhưng không phải Fire Alarm)
-    pendingIncidents: incidentLogs.filter(
-      (log) => log.status === "Active" && log.event_type !== "Fire Alarm"
-    ).length,
-  };
-
-  return stats;
 };
