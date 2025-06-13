@@ -103,13 +103,11 @@ const getSystemData = async () => {
       )
       .lean();
 
-    // Lấy thông tin về các sự cố/event logs (chỉ lấy 50 bản ghi gần nhất)
-    const eventLogs = await EventLogModel.find({})
+    const incidentLogs = await EventLogModel.find({})
       .select(
         "timestamp event_type description source_type source_id status acknowledged_at acknowledged_by_user_id zoneId panelId"
       )
-      .sort({ timestamp: -1 }) // Sắp xếp theo thời gian giảm dần
-      .limit(50) // Giới hạn 50 bản ghi gần nhất
+      .sort({ timestamp: -1 })
       .lean();
 
     // Tính toán số lượng đầu báo hiện có cho mỗi bo mạch FALC
@@ -130,7 +128,7 @@ const getSystemData = async () => {
       times: times || [],
       falcBoards: falcBoardsWithDetectorCount || [],
       detectors: detectors || [],
-      eventLogs: eventLogs || [],
+      incidentLogs: incidentLogs || [],
       lastUpdated: new Date().toISOString(),
     };
   } catch (error) {
@@ -141,7 +139,7 @@ const getSystemData = async () => {
       times: [],
       falcBoards: [],
       detectors: [],
-      eventLogs: [],
+      incidentLogs: [],
       lastUpdated: new Date().toISOString(),
       error: "Không thể lấy dữ liệu từ hệ thống",
     };
@@ -271,8 +269,8 @@ export const generateFireSafetyResponse = async (
     **Nhật ký sự cố hiện có:**
     **LƯU Ý QUAN TRỌNG: "Sự cố" và "Sự kiện" trong hệ thống này là CÙNG MỘT KHÁI NIỆM, đều là các bản ghi trong EventLog. Khi người dùng hỏi về "sự cố" hoặc "sự kiện", hãy đếm và thống kê TOÀN BỘ các bản ghi EventLog, không phân biệt loại.**
     ${
-      systemData.eventLogs.length > 0
-        ? systemData.eventLogs
+      systemData.incidentLogs.length > 0
+        ? systemData.incidentLogs
             .map(
               (log: any) =>
                 `- Thời gian: ${new Date(log.timestamp).toLocaleString("vi-VN")}
