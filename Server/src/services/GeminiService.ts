@@ -268,7 +268,8 @@ export const generateFireSafetyResponse = async (
         : "- Chưa có cài đặt âm lượng nào"
     }
 
-    **Nhật ký sự cố hiện có: (khi người dùng hỏi về sự cố thì nó cũng tương tự như sự kiện hãy trả lời đúng và chính xác)**
+    **Nhật ký sự cố hiện có:**
+    **LƯU Ý QUAN TRỌNG: "Sự cố" và "Sự kiện" trong hệ thống này là CÙNG MỘT KHÁI NIỆM, đều là các bản ghi trong EventLog. Khi người dùng hỏi về "sự cố" hoặc "sự kiện", hãy đếm và thống kê TOÀN BỘ các bản ghi EventLog, không phân biệt loại.**
     ${
       systemData.eventLogs.length > 0
         ? systemData.eventLogs
@@ -322,7 +323,7 @@ export const generateFireSafetyResponse = async (
     - Thiết lập mối quan hệ giữa các vùng và thiết bị    **4. Quản lý thời gian và lịch trình:**
     - Lên lịch, thêm, sửa, xóa các tác vụ hẹn giờ cho hệ thống
     - Cấu hình các chế độ hoạt động theo thời gian
-    - Quản lý lịch kiểm tra định kỳ và bảo trì
+    - Quản lý lịch kiểm tra định kỳ và bảo trì.
 
     **5. Quản lý và phân tích sự cố/Event Log:**
     - **Các loại sự cố:** Fire Alarm (báo động cháy), Fault (lỗi hệ thống), Restore (khôi phục), Offline (mất kết nối), Activation (kích hoạt), Deactivation (vô hiệu hóa), StatusChange (thay đổi trạng thái), ConfigChange (thay đổi cấu hình)
