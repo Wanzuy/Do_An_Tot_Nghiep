@@ -100,11 +100,13 @@ const getSystemData = () => __awaiter(void 0, void 0, void 0, function* () {
             .populate("zoneId", "name")
             .select("name detector_address detector_type status is_active falcBoardId zoneId last_reading last_reported_at")
             .lean();
-        // Lấy thông tin về các sự cố/event logs (chỉ lấy 50 bản ghi gần nhất)
-        const eventLogs = yield EventLogModel_1.default.find({})
-            .select("timestamp event_type description source_type source_id status acknowledged_at acknowledged_by_user_id zoneId panelId")
-            .sort({ timestamp: -1 }) // Sắp xếp theo thời gian giảm dần
-            .limit(50) // Giới hạn 50 bản ghi gần nhất
+        // lấy thông tin về các sự cố
+        const incidentLogs = yield EventLogModel_1.default.find({})
+            .populate("zoneId", "name description")
+            .populate("panelId", "name location")
+            .select("timestamp event_type source_type source_id description status priority severity acknowledged_at acknowledged_by_user_id zoneId panelId")
+            .sort({ timestamp: -1 }) // Sắp xếp theo thời gian mới nhất
+            .limit(100) // Giới hạn 100 sự cố gần nhất
             .lean();
         // Tính toán số lượng đầu báo hiện có cho mỗi bo mạch FALC
         const falcBoardsWithDetectorCount = falcBoards.map((board) => {
@@ -117,7 +119,7 @@ const getSystemData = () => __awaiter(void 0, void 0, void 0, function* () {
             times: times || [],
             falcBoards: falcBoardsWithDetectorCount || [],
             detectors: detectors || [],
-            eventLogs: eventLogs || [],
+            incidentLogs: incidentLogs || [],
             lastUpdated: new Date().toISOString(),
         };
     }
@@ -129,7 +131,7 @@ const getSystemData = () => __awaiter(void 0, void 0, void 0, function* () {
             times: [],
             falcBoards: [],
             detectors: [],
-            eventLogs: [],
+            incidentLogs: [],
             lastUpdated: new Date().toISOString(),
             error: "Không thể lấy dữ liệu từ hệ thống",
         };
@@ -148,6 +150,7 @@ const generateFireSafetyResponse = (userMessage, conversationHistory) => __await
     var _a, _b;
     // Lấy dữ liệu thực từ hệ thống
     const systemData = yield getSystemData();
+    // systemPrompt để cung cấp thông tin chi tiết về hệ thống báo cháy
     let systemPrompt = `
     Bạn là một trợ lý AI chuyên về quản lý hệ thống báo cháy và an toàn phòng cháy chữa cháy.
 
@@ -171,7 +174,8 @@ const generateFireSafetyResponse = (userMessage, conversationHistory) => __await
              - Lặp lại: ${time.repeat.length > 0 ? time.repeat.join(", ") : "Không"}
              - Trạng thái: ${time.isEnabled ? "Bật" : "Tắt"}`)
             .join("\n")
-        : "- Chưa có hẹn giờ nào"}    **Danh sách Bo mạch FALC hiện có:**
+        : "- Chưa có hẹn giờ nào"}    
+    **Danh sách Bo mạch FALC hiện có:**
     ${systemData.falcBoards.length > 0
         ? systemData.falcBoards
             .map((falc) => {
@@ -215,28 +219,84 @@ const generateFireSafetyResponse = (userMessage, conversationHistory) => __await
             .map((vol) => `- Mức âm lượng: ${vol.level}%
              - Cập nhật lần cuối: ${vol.updatedAt || "Không xác định"}`)
             .join("\n")
-        : "- Chưa có cài đặt âm lượng nào"}
-
-    **Nhật ký sự cố/sự kiện gần đây (50 bản ghi mới nhất):**
-    ${systemData.eventLogs.length > 0
-        ? systemData.eventLogs
-            .map((log) => {
-            var _a, _b;
-            return `- Thời gian: ${new Date(log.timestamp).toLocaleString("vi-VN")}
-             - Loại sự kiện: ${log.event_type} (Fire Alarm: Báo động; Fault: Lỗi hệ thống; Restore: Khôi phục; Offline: Mất kết nối; Activation: Kích hoạt; Deactivation: Vô hiệu hóa; StatusChange: Thay đổi trạng thái; ConfigChange: Thay đổi cấu hình)
-             - Mô tả: ${log.description}
-             - Nguồn sự kiện: ${log.source_type} (Detector: Từ đầu báo; NAC: Từ mạch báo động; Panel: Từ tủ điều khiển)
-             - ID nguồn: ${log.source_id || "Không có"}
-             - Khu vực: ${((_a = log.zoneId) === null || _a === void 0 ? void 0 : _a.name) || "Không xác định"}
-             - Tủ điều khiển: ${((_b = log.panelId) === null || _b === void 0 ? void 0 : _b.name) || "Không xác định"}
-             - Trạng thái xử lý: ${log.status} (Active là chưa được sử lý và cần xử lý; Cleared: Đã xử lý)
+        : "- Chưa có cài đặt âm lượng nào"}    **Nhật ký, thống kê, ghi nhận sự cố hiện có (100 sự cố gần nhất):**
+    **LƯU Ý QUAN TRỌNG: "Sự cố" và "Sự kiện" trong hệ thống này là CÙNG MỘT KHÁI NIỆM, đều là các bản ghi trong EventLog.**
+    
+    **THỐNG KÊ TỔNG QUAN:**
+    - Tổng số sự cố: ${systemData.incidentLogs.length}
+    - Sự cố cần sử lý (Active): ${systemData.incidentLogs.filter((log) => log.status === "Active")
+        .length}
+    - Sự cố đã xử lý (Cleared): ${systemData.incidentLogs.filter((log) => log.status === "Cleared")
+        .length}
+    - Báo động cháy (Fire Alarm): ${systemData.incidentLogs.filter((log) => log.event_type === "Fire Alarm").length}
+    - Lỗi hệ thống (Fault): ${systemData.incidentLogs.filter((log) => log.event_type === "Fault")
+        .length}
+    - Khôi phục (Restore): ${systemData.incidentLogs.filter((log) => log.event_type === "Restore")
+        .length}
+    - Mất kết nối (Offline): ${systemData.incidentLogs.filter((log) => log.event_type === "Offline")
+        .length}
+    
+    **CHI TIẾT CÁC SỰ CỐ:**
+    ${systemData.incidentLogs.length > 0
+        ? systemData.incidentLogs
+            .map((log, index) => {
+            var _a, _b, _c, _d, _e, _f;
+            return `${index + 1}. **[${log.status === "Active" ? "🔴 CẦN XỬ LÝ" : "✅ ĐÃ XỬ LÝ"}]**
+             - Thời gian: ${new Date(log.timestamp).toLocaleString("vi-VN", {
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit",
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+            })}
+             - Loại sự cố: **${log.event_type}**
+               ${log.event_type === "Fire Alarm"
+                ? "🔥 (Báo động cháy - MỨC ĐỘ NGUY HIỂM CAO)"
+                : log.event_type === "Fault"
+                    ? "⚠️ (Lỗi hệ thống - CẦN KIỂM TRA)"
+                    : log.event_type === "Restore"
+                        ? "🔄 (Khôi phục bình thường)"
+                        : log.event_type === "Offline"
+                            ? "📡 (Mất kết nối)"
+                            : log.event_type === "Activation"
+                                ? "🟢 (Kích hoạt)"
+                                : log.event_type === "Deactivation"
+                                    ? "🔴 (Vô hiệu hóa)"
+                                    : log.event_type === "StatusChange"
+                                        ? "🔄 (Thay đổi trạng thái)"
+                                        : log.event_type === "ConfigChange"
+                                            ? "⚙️ (Thay đổi cấu hình)"
+                                            : ""}
+             - Mô tả chi tiết: "${log.description}"
+             - Nguồn phát sinh: **${log.source_type}** 
+               ${log.source_type === "Detector"
+                ? "(🔍 Từ đầu báo)"
+                : log.source_type === "NAC"
+                    ? "(🔊 Từ mạch báo động)"
+                    : log.source_type === "Panel"
+                        ? "(🏢 Từ tủ điều khiển)"
+                        : ""}
+             - ID thiết bị: ${log.source_id || "Không xác định"}
+             - Khu vực (Zone): **${((_a = log.zoneId) === null || _a === void 0 ? void 0 : _a.name) || "Không xác định"}** ${((_b = log.zoneId) === null || _b === void 0 ? void 0 : _b.description) ? `(${log.zoneId.description})` : ""}
+             - Tủ điều khiển: **${((_c = log.panelId) === null || _c === void 0 ? void 0 : _c.name) || "Không xác định"}** ${((_d = log.panelId) === null || _d === void 0 ? void 0 : _d.location)
+                ? `- Vị trí: ${log.panelId.location}`
+                : ""}
+             - Trạng thái xử lý: **${log.status}** ${log.status === "Active"
+                ? "❌ (CHƯA XỬ LÝ - CẦN HÀNH ĐỘNG)"
+                : "✅ (ĐÃ HOÀN THÀNH)"}
+             - Mức độ ưu tiên: ${log.priority || "Bình thường"}
+             - Độ nghiêm trọng: ${log.severity || "Thông thường"}
              - Thời gian xác nhận: ${log.acknowledged_at
-                ? new Date(log.acknowledged_at).toLocaleString("vi-VN")
-                : "Chưa xác nhận"}
-             - Người xác nhận: ${log.acknowledged_by_user_id || "Chưa có"}`;
+                ? `✅ ${new Date(log.acknowledged_at).toLocaleString("vi-VN")}`
+                : "❌ CHƯA XÁC NHẬN"}
+             - Người xác nhận: ${((_e = log.acknowledged_by_user_id) === null || _e === void 0 ? void 0 : _e.username) ||
+                ((_f = log.acknowledged_by_user_id) === null || _f === void 0 ? void 0 : _f.email) ||
+                "Chưa có"}
+             ---`;
         })
             .join("\n")
-        : "- Chưa có sự cố/sự kiện nào được ghi nhận"}
+        : "- ✅ Chưa có sự cố nào được ghi nhận trong hệ thống"}
     
     **Thông tin cập nhật:** ${systemData.lastUpdated}
     ${systemData.error ? `**Lưu ý:** ${systemData.error}` : ""}
@@ -261,11 +321,11 @@ const generateFireSafetyResponse = (userMessage, conversationHistory) => __await
     - Thiết lập mối quan hệ giữa các vùng và thiết bị    **4. Quản lý thời gian và lịch trình:**
     - Lên lịch, thêm, sửa, xóa các tác vụ hẹn giờ cho hệ thống
     - Cấu hình các chế độ hoạt động theo thời gian
-    - Quản lý lịch kiểm tra định kỳ và bảo trì
+    - Quản lý lịch kiểm tra định kỳ và bảo trì.
 
     **5. Quản lý và phân tích sự cố/Event Log:**
-    - **Các loại sự kiện:** Fire Alarm (báo động cháy), Fault (lỗi hệ thống), Restore (khôi phục), Offline (mất kết nối), Activation (kích hoạt), Deactivation (vô hiệu hóa), StatusChange (thay đổi trạng thái), ConfigChange (thay đổi cấu hình)
-    - **Nguồn sự kiện:** Detector (từ đầu báo), NAC (từ mạch báo động), Panel (từ tủ điều khiển)
+    - **Các loại sự cố:** Fire Alarm (báo động cháy), Fault (lỗi hệ thống), Restore (khôi phục), Offline (mất kết nối), Activation (kích hoạt), Deactivation (vô hiệu hóa), StatusChange (thay đổi trạng thái), ConfigChange (thay đổi cấu hình)
+    - **Nguồn sự cố:** Detector (từ đầu báo), NAC (từ mạch báo động), Panel (từ tủ điều khiển)
     - **Trạng thái xử lý:** Active (cần xử lý ngay), Cleared (đã xử lý xong), Info (thông tin tham khảo)
     - **Phân tích xu hướng:** Thống kê tần suất sự cố theo thời gian, khu vực, loại thiết bị
     - **Quy trình xử lý:** Xác nhận sự cố, phân loại mức độ ưu tiên, giao việc xử lý, theo dõi tiến độ
@@ -285,7 +345,7 @@ const generateFireSafetyResponse = (userMessage, conversationHistory) => __await
     - Cấu hình các chế độ hoạt động và báo động
 
     **8. Giám sát và phân tích:**
-    - Xem và phân tích nhật ký sự kiện (Event Log)
+    - Xem và phân tích nhật ký sự cố (Event Log)
     - Khắc phục lỗi và giám sát hoạt động hệ thống
     - Thống kê và báo cáo tình trạng hệ thống
     - Phân tích xu hướng và dự đoán sự cố

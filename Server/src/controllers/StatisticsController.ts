@@ -57,6 +57,7 @@ class StatisticsController {
       })
         .populate("panelId", "name")
         .sort({ updatedAt: -1 }); // Tổng hợp trạng thái từ cả detectors và nacCircuits
+
       const detectorOperating = await DetectorModel.countDocuments({
         is_active: true,
       });

@@ -103,7 +103,7 @@ const getSystemData = async () => {
       )
       .lean();
 
-    // lấy thông tin về các sự cố và nhật ký sự kiện
+    // lấy thông tin về các sự cố
     const incidentLogs = await EventLogModel.find({})
       .populate("zoneId", "name description")
       .populate("panelId", "name location")
@@ -170,6 +170,7 @@ export const generateFireSafetyResponse = async (
   // Lấy dữ liệu thực từ hệ thống
   const systemData = await getSystemData();
 
+  // systemPrompt để cung cấp thông tin chi tiết về hệ thống báo cháy
   let systemPrompt = `
     Bạn là một trợ lý AI chuyên về quản lý hệ thống báo cháy và an toàn phòng cháy chữa cháy.
 
@@ -273,17 +274,14 @@ export const generateFireSafetyResponse = async (
     **LƯU Ý QUAN TRỌNG: "Sự cố" và "Sự kiện" trong hệ thống này là CÙNG MỘT KHÁI NIỆM, đều là các bản ghi trong EventLog.**
     
     **THỐNG KÊ TỔNG QUAN:**
-    - Tổng số sự cố/sự kiện: ${systemData.incidentLogs.length}
-    - Sự cố đang hoạt động (Active): ${
+    - Tổng số sự cố: ${systemData.incidentLogs.length}
+    - Sự cố cần sử lý (Active): ${
       systemData.incidentLogs.filter((log: any) => log.status === "Active")
         .length
     }
     - Sự cố đã xử lý (Cleared): ${
       systemData.incidentLogs.filter((log: any) => log.status === "Cleared")
         .length
-    }
-    - Sự cố chưa xác nhận: ${
-      systemData.incidentLogs.filter((log: any) => !log.acknowledged_at).length
     }
     - Báo động cháy (Fire Alarm): ${
       systemData.incidentLogs.filter(
@@ -303,14 +301,14 @@ export const generateFireSafetyResponse = async (
         .length
     }
     
-    **CHI TIẾT CÁC SỰ CỐ/SỰ KIỆN:**
+    **CHI TIẾT CÁC SỰ CỐ:**
     ${
       systemData.incidentLogs.length > 0
         ? systemData.incidentLogs
             .map(
               (log: any, index: number) =>
                 `${index + 1}. **[${
-                  log.status === "Active" ? "🔴 ĐANG HOẠT ĐỘNG" : "✅ ĐÃ XỬ LÝ"
+                  log.status === "Active" ? "🔴 CẦN XỬ LÝ" : "✅ ĐÃ XỬ LÝ"
                 }]**
              - Thời gian: ${new Date(log.timestamp).toLocaleString("vi-VN", {
                year: "numeric",

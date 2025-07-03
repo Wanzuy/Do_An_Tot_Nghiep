@@ -63,7 +63,7 @@ const nacBoardSchema = new mongoose_1.Schema({
         default: "Normal",
     },
     circuit_count: {
-        // circuit_count để lưu số lượng mạch NAC trên bo mạch này
+        // circuit_count để lưu số lượng mạch NAC  trên bo mạch này
         type: Number,
         required: true,
         min: 1,
