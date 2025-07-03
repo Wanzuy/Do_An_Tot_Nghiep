@@ -34,7 +34,6 @@ function Motherboard({ boardStats, loading }) {
       }}
       className="bg-[#333333]"
     >
-      {" "}
       <div className="flex flex-col items-center justify-center mb-4">
         <div className="relative flex items-center justify-center w-[180px] h-[180px] bg-[#0000004d] border-[10px] border-[#e53935] rounded-full shadow-[0_0_30px_rgba(183,28,28,0.3)]">
           <div className="flex flex-col items-center">

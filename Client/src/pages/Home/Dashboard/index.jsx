@@ -41,6 +41,7 @@ function Dashboard() {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
   useEffect(() => {
     fetchDashboardData();
     fetchSystemStats();
@@ -53,10 +54,12 @@ function Dashboard() {
     }, 120000);
     return () => clearInterval(interval);
   }, []);
+
   const fetchDashboardData = async () => {
     try {
       setDashboardData((prev) => ({ ...prev, loading: true }));
       const response = await handleAPI(apiEndpoint.statistics.dashboard);
+      console.log("Dashboard data response:", response);
 
       if (response && response.data) {
         setDashboardData({
@@ -116,7 +119,7 @@ function Dashboard() {
         );
 
         setEventLogs({
-          data: activeEvents.slice(0, 5), // Chỉ hiển thị 5 sự cố ACTIVE gần nhất
+          data: activeEvents.slice(0, 4), // Chỉ hiển thị 5 sự cố ACTIVE gần nhất
           loading: false,
           activeCount: activeEvents.length,
         });
@@ -307,7 +310,6 @@ function Dashboard() {
               {/* Block 3: Quick Actions */}
               <div className="bg-[#444444] rounded p-3 border border-solid border-[#FFFFFF0D]">
                 <div className="flex items-center justify-between mb-3">
-                  {" "}
                   <div className="text-white font-medium text-3xl">
                     {t("Dashboard.quickActions")}
                   </div>
@@ -321,7 +323,10 @@ function Dashboard() {
                   </button>
                   <button className="bg-[#555555] hover:bg-[#666666] text-white p-2 rounded transition flex flex-col items-center">
                     <SettingOutlined style={{ fontSize: "18px" }} />
-                    <Link to="/cai-dat" className="text-xl mt-1">
+                    <Link
+                      to="/cai-dat"
+                      className="text-xl mt-1 hover:!text-white"
+                    >
                       {t("Dashboard.configuration")}
                     </Link>
                   </button>{" "}
